@@ -1,2 +1,2 @@
 # HiPER
-Hindsight Prioritized Experience Replay, with extensions to hierarchical models
+Hierarchical Hindsight Prioritized Experience Replay
