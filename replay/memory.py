@@ -77,6 +77,8 @@ class Prioritized_Replay_Memory():
 
             batch.append(index)
 
+        assert(len(batch) == batch_size)
+
         return batch 
 
     def sample_batch(self, batch_size, beta):

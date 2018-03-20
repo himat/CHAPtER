@@ -43,7 +43,6 @@ class QNetwork():
 
         model = Sequential()
 
-        
 
         if deep == "deep":
             #weight_initializer = keras.initializers.RandomUniform(-0.05, 0.05)
@@ -97,19 +96,32 @@ class QNetwork():
 
         model.compile(optimizer=opt, loss="mean_squared_error", metrics=["accuracy"])
 
+        target_model = keras.models.clone_model(model)
+        target_model.set_weights(model.get_weights())
+
         self.model = model 
+        self.target_model = target_model 
+
+        self.num_obs = num_inputs
+        self.num_actions = num_outputs
         
     def predict(self, x):
         assert(x.ndim == 2)
 
         batch_size = x.shape[0]
-        return self.model.predict(x, batch_size)
+        return self.model.predict(x, batch_size), self.target_model.predict(x, batch_size)
 
     def train(self, x, y, batch_size=1):
         assert(x.ndim == 2)
 
+        assert(x.shape[0] == y.shape[0])
+        assert(y.shape[1] == self.num_actions)
+
         # self.model.train_on_batch(x, y)
         self.model.fit(x, y, batch_size=batch_size, verbose=0)
+
+    def update_target_model(self):
+        self.target_model.set_weights(self.model.get_weights())
 
     def save_model(self, model_name):
         self.model.save(curr_model_dir + model_name + model_file_ext)
@@ -132,7 +144,7 @@ class DQN_Agent():
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
         model_name=None, render=False, deep=False, seed=None, alt_learn=False,
-        prioritized_mem=False):
+        priority_replay=False):
 
         global curr_model_dir
         global logger 
@@ -166,7 +178,7 @@ class DQN_Agent():
         self.model_name = model_name
         self.render = render 
 
-        self.prioritized_mem = prioritized_mem
+        self.priority_replay = priority_replay
 
 
 
@@ -184,12 +196,12 @@ class DQN_Agent():
 
     def take_step(self, curr_state, batch_size):
         curr_state = curr_state.reshape((1, -1))
-        q_values = self.net.predict(curr_state)
-        action_i = self.epsilon_greedy_policy(q_values)
+        q_values_pred, q_values_target = self.net.predict(curr_state)
+        action_i = self.epsilon_greedy_policy(q_values_pred)
         next_state, reward, is_terminal, debug_info = self.env.step(action_i)
         next_state = next_state.reshape((1, -1))
 
-        return (curr_state, reward, action_i, next_state, is_terminal), q_values
+        return (curr_state, reward, action_i, next_state, is_terminal) 
 
 
     def calc_target(self, experience, q_values=None):
@@ -197,9 +209,10 @@ class DQN_Agent():
         (curr_state, reward, action_i, next_state, is_terminal) = experience
 
         if q_values == None:
-            q_values = self.net.predict(curr_state)
+            q_values_pred, q_values_target = self.net.predict(curr_state)
         
-        predictions = np.amax(self.net.predict(next_state), axis=1)
+        next_q_values_pred, next_q_values_target = self.net.predict(next_state)
+        predictions_target = np.amax(next_q_values_target, axis=1)
         #logger.info(f"reward: {reward.shape}, is_terminal: {is_terminal.shape}, predcitions: {predictions.shape}")
 
         y = np.zeros(shape=action_i.shape)
@@ -208,11 +221,11 @@ class DQN_Agent():
             if is_terminal[idx] or (self.alt_learn and next_state[idx, 0] > 0.5):
                 y[idx] = reward[idx]
             else:
-                y[idx] = reward[idx] + self.gamma * predictions[idx]
+                y[idx] = reward[idx] + self.gamma * predictions_target[idx]
 
         #logger.info(f"y: {y.shape}")
 
-        target = q_values.copy()
+        target = q_values_pred.copy()
         #logger.info(f"target: {target.shape}")
 
         #logger.info(f"{action_i} target: {target} indexed: {target[:, action_i]}")
@@ -221,10 +234,12 @@ class DQN_Agent():
             target[idx, action_i[idx]] = y[idx]
 
         
-        predictions = predictions.reshape((-1, 1))
-        assert(y.shape == predictions.shape)
+        pred_max_action = np.zeros(shape=action_i.shape) 
+        for idx in range(q_values_pred.shape[0]):
+            pred_max_action[idx] = q_values_pred[idx, action_i[idx]]
+        assert(y.shape == pred_max_action.shape)
 
-        td_errors = y - predictions 
+        td_errors = y - pred_max_action 
         
         return target, td_errors
 
@@ -243,9 +258,11 @@ class DQN_Agent():
         save_episode_mod = 300
         save_steps_mod = 100000
 
-        prioritized_mem_alpha = 0.6
-        prioritized_mem_beta_init = 0.4
-        prioritized_mem_beta = prioritized_mem_beta_init # TODO: anneal
+        update_target_model_eps_mod = 20 # 50
+
+        priority_replay_alpha = 0.6
+        priority_replay_beta_init = 0.4
+        priority_replay_beta = priority_replay_beta_init # TODO: anneal
         
 
         num_episodes = 0
@@ -255,8 +272,8 @@ class DQN_Agent():
         train_variance = []
 
 
-        if self.prioritized_mem:
-            rep_mem = Prioritized_Replay_Memory(alpha=prioritized_mem_alpha)
+        if self.priority_replay:
+            rep_mem = Prioritized_Replay_Memory(alpha=priority_replay_alpha)
         else:
             rep_mem = Replay_Memory()
 
@@ -304,7 +321,7 @@ class DQN_Agent():
                 for i in range(batch_size):
                     # exp_batch = [] # added line
 
-                    experience, q_values = self.take_step(curr_state, batch_size)
+                    experience = self.take_step(curr_state, batch_size)
                     _, reward, action_i, curr_state, is_terminal = experience
                     exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
 
@@ -323,8 +340,8 @@ class DQN_Agent():
                     for exp in exp_batch:
                         rep_mem.append(exp)
 
-                    if self.prioritized_mem:
-                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=prioritized_mem_beta)
+                    if self.priority_replay:
+                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
                     else:
                         train_batch = rep_mem.sample_batch(rep_batch_size)
                     train_size = rep_batch_size
@@ -335,11 +352,12 @@ class DQN_Agent():
                 targets, td_errors = self.calc_target(tuple(exp_arr_list))
                 self.net.train(curr_states, targets, batch_size=train_size)
 
-                if self.prioritized_mem:
+                if self.priority_replay:
                     rep_mem.update_priorities(batch_indexes, np.abs(td_errors))
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
+
 
             #logging/saving/recording section
             if self.env_name == "MountainCar-v0" and ep_reward > -200:
@@ -377,6 +395,10 @@ class DQN_Agent():
 
                 save_video_steps_ct += 1          
             #end logging/saving/recording section
+                
+
+            if num_episodes % update_target_model_eps_mod == 0:
+                self.net.update_target_model()
                 
             num_total_steps += num_ep_steps     
             num_episodes += 1
@@ -425,8 +447,8 @@ class DQN_Agent():
 
             while True:
                 curr_state = curr_state.reshape((1, -1))
-                q_values = self.net.predict(curr_state)
-                action_i = self.epsilon_greedy_policy(q_values)
+                q_values_pred, q_values_target = self.net.predict(curr_state)
+                action_i = self.epsilon_greedy_policy(q_values_pred)
 
                 curr_state, reward, is_terminal, debug_info = self.env.step(action_i)
 
@@ -456,7 +478,7 @@ class DQN_Agent():
         curr_state = self.env.reset()
         # Initialize your replay memory with a burn_in number of episodes / transitions. 
         for i in range(rep_mem.burn_in):
-            experience, q_values = self.take_step(curr_state, 1)
+            experience = self.take_step(curr_state, 1)
             (prev_state, reward, action, curr_state, is_terminal) = experience
             rep_mem.append((prev_state.copy(), reward, action, curr_state.copy(), is_terminal))
             if is_terminal:

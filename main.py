@@ -15,7 +15,7 @@ curr_model_dir = None
 models_dir = "models"
 
 def parse_arguments():
-	# Ex. python DQN_Implementation.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem --deepness deep
+	# Ex. python main.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem --deepness deep
     parser = argparse.ArgumentParser(description='Deep Q Network Argument Parser')
     parser.add_argument('--env',dest='env',type=str,required=True)
     parser.add_argument('--model-name',dest='model_name',type=str,required=True)
@@ -30,7 +30,7 @@ def parse_arguments():
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
 
-    parser.add_argument('--prioritized_mem', dest='prioritized_mem', action="store_true")
+    parser.add_argument('--priority-replay', dest='priority_replay', action="store_true")
 
 
     return parser.parse_args()
@@ -116,7 +116,7 @@ def main(args):
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
         deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn,
-        prioritized_mem=args.prioritized_mem)
+        priority_replay=args.priority_replay)
 
     if args.record_video_only:
         agent.test(record_video=True)
