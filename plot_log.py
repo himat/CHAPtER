@@ -53,6 +53,9 @@ if __name__ == '__main__':
   
   args = parser.parse_args()
 
+  if not os.path.exists(PLOT_DIR):
+      os.makedirs(PLOT_DIR)
+
   x_label = "Episode" if args.use_eps else "Step"
   save_file_name = f'{PLOT_DIR}/{os.path.basename(args.log)}.png'
   
