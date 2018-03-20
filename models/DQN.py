@@ -285,28 +285,23 @@ class DQN_Agent():
 
                 exp_batch = []
                 
-                for i in range(batch_size):
-                    # exp_batch = [] # added line
+                experience, q_values = self.take_step(curr_state, batch_size)
+                _, reward, action_i, curr_state, is_terminal = experience
+                exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
 
-                    experience, q_values = self.take_step(curr_state, batch_size)
-                    _, reward, action_i, curr_state, is_terminal = experience
-                    exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
-
-                    if reward == 0:
-                        logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
+                if reward == 0:
+                    logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
                     
-                    ep_reward += reward
-                    num_ep_steps += 1
-                
-                    if is_terminal:
-                        break
+                ep_reward += reward
+                num_ep_steps += 1
                 
                 train_batch = exp_batch
                 train_size = len(exp_batch)
                 if rep_batch_size:
                     for exp in exp_batch:
                         rep_mem.append(exp)
-                    train_batch = rep_mem.sample_batch(rep_batch_size)
+                    train_batch = rep_mem.sample_batch(rep_batch_size-1)
+                    train_batch.append(exp)
                     train_size = rep_batch_size
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
