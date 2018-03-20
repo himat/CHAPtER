@@ -95,7 +95,7 @@ def main(args):
         use_episodes = False
         if not args.num_eps:
             num_train_episodes = None
-        num_train_steps = 900000
+        num_train_steps = 800000
          
     elif env_name == "MountainCar-v0":
         gamma = 0.99
