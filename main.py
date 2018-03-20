@@ -38,6 +38,19 @@ def main(args):
     global curr_model_dir
     
     args = parse_arguments()
+
+    if args.seed != None:
+        time_seed = args.seed
+
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+
+    curr_model_dir = f"{models_dir}/{args.model_name}/"
+    if not os.path.exists(curr_model_dir):
+        os.makedirs(curr_model_dir)
+
+    if not os.path.exists(logs_dir):
+        os.makedirs(logs_dir)
     
     #start logging settings
     os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
@@ -55,6 +68,8 @@ def main(args):
     logger.addHandler(ch)
 
     #end logging settings
+
+    logger.info(f"{args}")
 
     #set consistent seed based on time
     time_seed = int(''.join(time_str.split('_'))) % (2 ** 32)
@@ -93,15 +108,7 @@ def main(args):
     if args.deepness:
         assert(args.deepness == "deep" or args.deepness == "dueling")
 
-    # You want to create an instance of the DQN_Agent class here, and then train / test it. 
-    logger.info(f"{args}")
-    if args.seed != None:
-        time_seed = args.seed
-
-    curr_model_dir = f"{models_dir}/{args.model_name}/"
-    if not os.path.exists(curr_model_dir):
-        os.makedirs(curr_model_dir)
-
+    # You want to create an instance of the DQN_Agent class here, and then train / test it.
 
     np.random.seed(time_seed)
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
