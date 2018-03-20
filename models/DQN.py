@@ -1,223 +1,439 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import keras, tensorflow as tf, numpy as np, gym, sys, copy, argparse
-from keras.models import Sequential, Model
-from keras.layers import Input, Dense, Flatten, Lambda
-from keras import optimizers
+import time
 import keras.backend as K
-import random
-from keras.models import load_model
+from keras.models import Sequential, Model
+from keras.layers import Input, Dense, Activation, Lambda 
+from random import sample
+import logging
+import time
+import os.path
 from replay.memory import Replay_Memory
 
-class Q_Network():
+logger = None 
 
-	# This class essentially defines the network architecture. 
-	# The network should take in state of the world as an input, 
-	# and output Q values of the actions available to the agent as the output. 
+models_dir = "models"
+curr_model_dir = None  
+logs_dir = "logs"
+model_file_ext = ".h5"
 
-	def __init__(self, model_type, environment_name):
-		# Define your network architecture here. It is also a good idea to define any training operations 
-		# and optimizers here, initialize your variables, or alternately compile your model here.  
-		self.environment_name = environment_name
-		self.env = gym.make(environment_name)
-		self.state_size = self.env.observation_space.shape[0]
-		self.action_size = self.env.action_space.n
-		
-		if model_type == "duel": 
-			x = Input(shape=(self.state_size,))
-			h = x
-			for i in range(3):
-				h = Dense(24, activation='tanh')(h)
-			y = Dense(self.action_size+1)(h)
-			z = Lambda(lambda a: K.expand_dims(a[:, 0], axis=-1) + a[:, 1:], output_shape=(self.action_size,))(y)
-			self.model = Model(inputs=x, outputs=z)
+# Performs the combining operation as specified by the dueling paper
+def dueling_combine(sv_adv_layer):
+    import keras 
 
-		elif model_type == "dqn":
-			self.model = Sequential()
-			self.model.add(Dense(24, input_dim=self.state_size, activation='tanh'))
-			self.model.add(Dense(24, activation='tanh'))
-			self.model.add(Dense(self.action_size, activation='linear'))
+    state_value = sv_adv_layer[0]
+    advantage = sv_adv_layer[1]
 
-		elif model_type == "linear":
-			self.model = Sequential()
-			self.model.add(Dense(self.action_size, kernel_initializer='random_normal', input_dim=self.state_size))
+    num_actions = advantage.shape[1].value 
 
-		opt = optimizers.Adam(lr=0.1, decay=1e-6)#, clipnorm=1.)
-		self.model.compile(loss='mse', optimizer=opt)
+    adv_mean = keras.backend.mean(advantage, axis=1, keepdims=True)
+    
+    return state_value + (advantage - adv_mean)
 
-	def save_model_weights(self, suffix):
-		# Helper function to save your model / weights. 
-		self.model.save_weights('model_weights' + suffix + '.h5')
+class QNetwork():
 
-	def load_model(self, model_file):
-		# Helper function to load an existing model.
-		self.model = load_model(model_file)
+    # This class essentially defines the network architecture. 
+    # The network should take in state of the world as an input, 
+    # and output Q values of the actions available to the agent as the output. 
 
-	def load_model_weights(self,weight_file):
-		# Helper funciton to load model weights. 
-		self.model.load_weights(weight_file)
+    def __init__(self, environment_name, num_inputs, num_outputs, lr, deep=False):
+        # Define your network architecture here. It is also a good idea to define any training operations 
+        # and optimizers here, initialize your variables, or alternately compile your model here.  
+        # weight_init = keras.initializers.RandomUniform(minval=-1.0, maxval=1.0)
+
+        model = Sequential()
+
+        
+
+        if deep == "deep":
+            #weight_initializer = keras.initializers.RandomUniform(-0.05, 0.05)
+            weight_initializer = keras.initializers.glorot_uniform()
+            #weight_initializer = keras.initializers.he_normal()
+
+            logger.info("Using deep architecture.")
+            model.add(Dense(40, activation='relu', input_shape=(num_inputs,), kernel_initializer=weight_initializer))
+            model.add(Dense(30, activation='relu', kernel_initializer=weight_initializer))
+            model.add(Dense(30, activation='relu', kernel_initializer=weight_initializer))
+            model.add(Dense(num_outputs))
+
+
+        elif deep == "dueling":
+
+            logger.info("Using dueling architecture.")
+
+            weight_initializer = keras.initializers.glorot_uniform()
+            weight_initializer_dense = keras.initializers.RandomUniform(-0.05, 0.05)
+
+            inputs = Input(shape=(num_inputs, ))
+            d = Dense(25, activation='relu', kernel_initializer=weight_initializer)(inputs)
+            d = Dense(25, activation='relu', kernel_initializer=weight_initializer)(d)
+            
+            # Stream 1
+            state_value = Dense(10, activation='relu', kernel_initializer=weight_initializer)(d)
+            state_value = Dense(10, activation='relu', kernel_initializer=weight_initializer)(state_value)
+            state_value = Dense(1, activation='linear', name="state_value")(state_value)
+
+            # Stream 2
+            advantage = Dense(10, activation='relu', kernel_initializer=weight_initializer)(d)
+            advantage = Dense(10, activation='relu', kernel_initializer=weight_initializer)(advantage)
+            advantage = Dense(num_outputs, activation='linear', name="advantage")(advantage)
+
+            # Combine
+            q_values = Lambda(dueling_combine, output_shape=(num_outputs,))([state_value, advantage])
+
+            model = Model(inputs=inputs, outputs=q_values)
+
+
+        else:
+            logger.info("Using linear architecture.")
+
+            weight_initializer = keras.initializers.RandomUniform(-0.05, 0.05)
+            weight_initializer = keras.initializers.RandomUniform(-1, 0)
+            model.add(Dense(num_outputs, input_shape=(num_inputs,), kernel_initializer=weight_initializer))
+
+        logger.info(f"Using initial learning rate {lr}")
+        opt = keras.optimizers.adam(lr=lr)
+        #opt = keras.optimizers.SGD(lr=lr)
+
+        model.compile(optimizer=opt, loss="mean_squared_error", metrics=["accuracy"])
+
+        self.model = model 
+        
+    def predict(self, x):
+        assert(x.ndim == 2)
+
+        batch_size = x.shape[0]
+        return self.model.predict(x, batch_size)
+
+    def train(self, x, y, batch_size=1):
+        assert(x.ndim == 2)
+
+        # self.model.train_on_batch(x, y)
+        self.model.fit(x, y, batch_size=batch_size, verbose=0)
+
+    def save_model(self, model_name):
+        self.model.save(curr_model_dir + model_name + model_file_ext)
+
+    def load_model(self, model_name):
+        # Helper function to load an existing model.
+        self.model = keras.models.load_model(curr_model_dir + model_name + model_file_ext, custom_objects={"keras": keras})
+
 
 class DQN_Agent():
 
-	# In this class, we will implement functions to do the following. 
-	# (1) Create an instance of the Q Network class.
-	# (2) Create a function that constructs a policy from the Q values predicted by the Q Network. 
-	#		(a) Epsilon Greedy Policy.
-	# 		(b) Greedy Policy. 
-	# (3) Create a function to train the Q Network, by interacting with the environment.
-	# (4) Create a function to test the Q Network's performance on the environment.
-	# (5) Create a function for Experience Replay.
-	
-	def __init__(self, model_type, environment_name, replay_memory, render=False):
+    # In this class, we will implement functions to do the following. 
+    # (1) Create an instance of the Q Network class.
+    # (2) Create a function that constructs a policy from the Q values predicted by the Q Network. 
+    #       (a) Epsilon Greedy Policy.
+    #       (b) Greedy Policy. 
+    # (3) Create a function to train the Q Network, by interacting with the environment.
+    # (4) Create a function to test the Q Network's performance on the environment.
+    # (5) Create a function for Experience Replay.
+    
+    def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
+        model_name=None, render=False, deep=False, seed=None, alt_learn=False):
 
-		# Create an instance of the network itself, as well as the memory. 
-		# Here is also a good place to set environmental parameters,
-		# as well as training parameters - number of episodes / iterations, etc. 
-		self.gamma = 1 if environment_name == "MountainCar-v0" else 0.99
-		self.epsilon_max = 0.5
-		self.epsilon_min = 0.05
-		self.episodes_max = 5000 if environment_name == "MountainCar-v0" else 1000000
-		self.batch_size = 32
+        global curr_model_dir
+        global logger 
 
-		self.environment_name = environment_name
-		self.model_type = model_type
-		self.render = render
-		self.train_env = gym.make(self.environment_name)
-		self.test_env = gym.make(self.environment_name)
-		self.Q_network = Q_Network(model_type, environment_name)
-		self.replay_memory = replay_memory
+        curr_model_dir = c_model_dir 
+        logger = c_logger
 
-		self.iter = 0
+        # Create an instance of the network itself, as well as the memory. 
+        # Here is also a good place to set environmental parameters,
+        # as well as training parameters - number of episodes / iterations, etc. 
+        self.env_name = environment_name
+        self.env = gym.make(environment_name)
 
-	def epsilon_greedy_policy(self, q_values):
-		# Creating epsilon greedy probabilities to sample from.             
-		random_number = np.random.rand(1)[0]
-		offset = (self.epsilon_max - self.epsilon_min) / 1000000 * self.iter
-		if random_number < max(self.epsilon_max - offset, self.epsilon_min):
-			return np.random.randint(len(q_values)) # end points included
-		else: 
-			return np.argmax(q_values)
+        if seed != None:
+            logger.info(f"Gym seed set to {seed}")
+            self.env.seed(seed)
+        self.seed = seed
 
-	def greedy_policy(self, q_values):
-		# Creating greedy policy for test time. 
-		return np.argmax(q_values)
+        num_obs = self.env.observation_space.shape[0]
+        num_actions = self.env.action_space.n
+        self.net = QNetwork(environment_name, num_obs, num_actions, lr_init, deep=deep)
+        if test_mode:# or os.path.exists(model_name + model_file_ext):
+            assert(model_name)
+            self.net.load_model(model_name)
+        
+        self.gamma = gamma
+        self.eps_init = eps_init
+        self.eps = eps_init 
+        self.alt_learn = alt_learn
 
-	def train(self):
-		# In this function, we will train our network. 
-		# If training without experience replay_memory, then you will interact with the environment 
-		# in this function, while also updating your network parameters. 
-
-		# If you are using a replay memory, you should interact with environment here, and store these 
-		# transitions to memory, while also updating your model.
-		
-		if not self.replay_memory:
-			print("not replay memory")
-			best_reward = 0.
-			for episode in range(self.episodes_max):
-				state = self.train_env.reset()
-				done = False
-				while not done:
-					if self.render:
-						env.render()
-					reshaped_state = np.reshape(state,(1,self.Q_network.state_size))
-					q_values = self.Q_network.model.predict(reshaped_state)
-					action = self.epsilon_greedy_policy(q_values)
-					next_state, reward, done, info = self.train_env.step(action)
-					state = next_state
-					self.iter += 1
-
-					reshaped_next_state = np.reshape(state,(1,self.Q_network.state_size))
-					target = self.Q_network.model.predict(reshaped_state)
-					if done:
-						target[0][action] = reward
-					else:
-						next_q_values = self.Q_network.model.predict(reshaped_next_state)
-						target[0][action] = reward + self.gamma * np.amax(next_q_values)
-					self.Q_network.model.fit(reshaped_state, target, verbose=0)
-					
-
-					if (self.iter % 10000 == 0):
-						current_reward = self.test()
-						print(str(current_reward) + " iter " + str(self.iter) + " epi " + str(episode))
-						if (current_reward > best_reward):
-							best_reward = current_reward
-						file_name = 'model_' + str(self.iter) + '.h5'
-						print("Saving model...")
-						self.Q_network.model.save(file_name)
-
-				if self.environment_name == "CartPole-v0" and self.iter > 1000000: 
-					return
-			return
-
-		else:
-			print("replay memory")
-			replay_memory = Replay_Memory()
-			best_reward = 0.
-			stuck = 0.
-			for episode in range(self.episodes_max):
-				state = self.train_env.reset()
-				done = False
-				while not done:
-					if self.render:
-						env.render()
-					reshaped_state = np.reshape(state, (1,self.Q_network.state_size))
-					q_values = self.Q_network.model.predict(reshaped_state)
-					action = self.epsilon_greedy_policy(q_values)
-					next_state, reward, done, info = self.train_env.step(action)
-					replay_memory.append((state, action, reward, next_state, done))
-					state = next_state
-					self.iter += 1
-				
-					minibatch = replay_memory.sample_batch(self.batch_size)
-					inputs  = np.array([x[0] for x in minibatch])
-					targets = np.array(self.Q_network.model.predict(inputs))
-					next_states = np.array([x[3] for x in minibatch])
-					next_q_values = np.array(self.Q_network.model.predict(next_states))
-					for i in range(len(minibatch)):
-						mini_state, mini_action, mini_reward, mini_next_state, mini_done = minibatch[i]
-						if mini_done or (self.environment_name == "MountainCar-v0" and self.model_type == "linear" and next_states[0] > 0.5):
-							targets[i][mini_action] = mini_reward
-						else:
-							targets[i][mini_action] = reward + self.gamma * np.amax(next_q_values[i])
-					self.Q_network.model.fit(inputs, targets, verbose=0)
-
-					if (self.iter % 1000 == 0):
-						current_reward = self.test()
-						print(str(current_reward) + " iter " + str(self.iter) + " epi " + str(episode))
-						if (current_reward > best_reward):
-							best_reward = current_reward
-						file_name = 'model_' + str(self.iter) + '.h5'
-						print("Saving model...")
-						self.Q_network.model.save(file_name)
-				if self.environment_name == "CartPole-v0" and self.iter > 1000000: 
-					return
-			return
-	def test(self, model_file=None):
-		# Evaluate the performance of your agent over 100 episodes, by calculating cummulative rewards for the 100 episodes.
-		# Here you need to interact with the environment, irrespective of whether you are using a memory. 
-		if model_file != None:
-			model = load_model(model_file)
-		else:
-			model = self.Q_network.model
-		total_reward = 0.
-		episodes_max = 20
-		self.epsilon_max = 0.05
-		for episode in range(episodes_max):
-			test_done = False
-			state = self.test_env.reset()
-
-			while not test_done:
-				state = np.reshape(state,(1,self.Q_network.state_size))
-				q_values = self.Q_network.model.predict(state)
-				action = self.epsilon_greedy_policy(q_values)
-				test_next_state, test_reward, test_done, test_info = self.test_env.step(action)
-				total_reward += test_reward
-				state = test_next_state
-
-		total_reward /= episodes_max
-		return total_reward
+        self.model_name = model_name
+        self.render = render 
 
 
 
-	def burn_in_memory(self):
-		# Initialize your replay memory with a burn_in number of episodes / transitions. 
-		return Replay_Memory()
+    def epsilon_greedy_policy(self, q_values):
+        # Creating epsilon greedy probabilities to sample from.         
+        rand_prob = np.random.rand(1)
+        if rand_prob < self.eps:
+            return np.random.randint(len(q_values))
+        else:
+            return np.argmax(q_values)
+
+    def greedy_policy(self, q_values):
+        # Creating greedy policy for test time. 
+        return np.argmax(q_values)
+
+    def take_step(self, curr_state, batch_size):
+        curr_state = curr_state.reshape((1, -1))
+        q_values = self.net.predict(curr_state)
+        action_i = self.epsilon_greedy_policy(q_values)
+        next_state, reward, is_terminal, debug_info = self.env.step(action_i)
+        next_state = next_state.reshape((1, -1))
+
+        return (curr_state, reward, action_i, next_state, is_terminal), q_values
+
+
+    def calc_target(self, experience, q_values=None):
+        
+        (curr_state, reward, action_i, next_state, is_terminal) = experience
+
+        if q_values == None:
+            q_values = self.net.predict(curr_state)
+        
+        predictions = np.amax(self.net.predict(next_state), axis=1)
+        #logger.info(f"reward: {reward.shape}, is_terminal: {is_terminal.shape}, predcitions: {predictions.shape}")
+
+        y = np.zeros(shape=action_i.shape)
+
+        for idx in range(action_i.shape[0]):
+            if is_terminal[idx] or (self.alt_learn and next_state[idx, 0] > 0.5):
+                y[idx] = reward[idx]
+            else:
+                y[idx] = reward[idx] + self.gamma * predictions[idx]
+
+        #logger.info(f"y: {y.shape}")
+
+        target = q_values.copy()
+        #logger.info(f"target: {target.shape}")
+
+        #logger.info(f"{action_i} target: {target} indexed: {target[:, action_i]}")
+        
+        for idx in range(action_i.shape[0]):
+            target[idx, action_i[idx]] = y[idx]
+        
+        return target
+
+
+    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True):
+        # In this function, we will train our network. 
+        # If training without experience replay_memory, then you will interact with the environment 
+        # in this function, while also updating your network parameters. 
+        # If you are using a replay memory, you should interact with environment here, and store these 
+        # transitions to memory, while also updating your model.
+
+        batch_size = 32
+        print_episode_mod = 200 # print every
+        test_episode_mod = 200
+
+        save_episode_mod = 300
+        save_steps_mod = 100000
+        
+        
+
+        num_episodes = 0
+        num_total_steps = 0
+
+        train_average = 0 
+        train_variance = []
+
+
+        rep_mem = Replay_Memory()
+        if rep_batch_size:
+            self.burn_in_memory(rep_mem)
+            # for i in range(1, 5):
+            #     rep_mem.append((np.array([0.6 - i * 0.0001, i * 0.0001], shape=(1, 2)), -1.0, True, 1, np.array([0.6, i], shape=(1, 2))))
+
+        counter = num_episodes if use_episodes else num_total_steps
+        counter_limit = episodes_limit if use_episodes else steps_limit
+        save_mod = save_episode_mod if use_episodes else save_steps_mod
+        save_steps_ct = -1
+        save_video_episode_mod = counter_limit // 3 # Want videos every 1/3 of training process
+        save_video_steps_ct = -1
+        
+
+        logger.info("Training for {} {}".format(counter_limit, "episodes" if use_episodes else "steps"))
+
+        best_test = None
+
+        # while num_episodes < episodes_limit:
+        # while num_total_steps < steps_limit:
+        while counter < counter_limit:
+
+            if num_episodes % print_episode_mod == 0:
+                logger.info(f"Episode {num_episodes}")
+                logger.info(f"Step {num_total_steps}")
+
+            initial_state = self.env.reset()
+            curr_state = initial_state
+
+            num_ep_steps = 0 
+            ep_reward = 0
+
+            # Run till episode termination
+            is_terminal = False
+
+            # Go through an episode
+            while not is_terminal:
+                # self.eps = max(self.eps_init / 5, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
+                self.eps = max(0.05, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
+
+                exp_batch = []
+                
+                for i in range(batch_size):
+                    # exp_batch = [] # added line
+
+                    experience, q_values = self.take_step(curr_state, batch_size)
+                    _, reward, action_i, curr_state, is_terminal = experience
+                    exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
+
+                    if reward == 0:
+                        logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
+                    
+                    ep_reward += reward
+                    num_ep_steps += 1
+                
+                    if is_terminal:
+                        break
+                
+                train_batch = exp_batch
+                train_size = len(exp_batch)
+                if rep_batch_size:
+                    for exp in exp_batch:
+                        rep_mem.append(exp)
+                    train_batch = rep_mem.sample_batch(rep_batch_size)
+                    train_size = rep_batch_size
+                    
+                exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
+                
+                curr_states, targets = exp_arr_list[0], self.calc_target(tuple(exp_arr_list))
+                self.net.train(curr_states, targets, batch_size=train_size)
+                    
+                if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
+                    break
+
+            #logging/saving/recording section
+            if self.env_name == "MountainCar-v0" and ep_reward > -200:
+                logger.info(f"*****Got better reward: {ep_reward} on ep {num_episodes}")
+
+            train_average += ep_reward / print_episode_mod
+            train_variance += [ep_reward]
+            if num_episodes % print_episode_mod == 0:
+                logger.info("Episode reward mean: {:.3f}".format(train_average))
+                logger.info("Episode reward std: {:.3f}".format(np.sqrt(np.sum(np.square(np.array(train_variance) - train_average)) / print_episode_mod)))
+                train_average, train_variance = (0, [])
+                
+
+            if num_episodes % test_episode_mod == 0:
+                _, result = self.test(num_episodes=20)
+                
+                if save_best:
+                    if best_test == None or best_test < result:
+                        model_name_ep = self.model_name
+                        self.net.save_model(model_name_ep)
+                        logger.info(f"Beat previous value of {best_test}! Saved model to {curr_model_dir + model_name_ep + model_file_ext}")
+                        best_test = result
+            
+            if counter // save_mod > save_steps_ct:
+                model_name_ep = f"{self.model_name}_{counter // save_mod}_of_{counter_limit // save_mod}"
+                self.net.save_model(model_name_ep)
+                logger.info(f"Saved model to {curr_model_dir + model_name_ep + model_file_ext}")
+
+                save_steps_ct += 1
+
+            if counter // save_video_episode_mod > save_video_steps_ct:
+                model_name_ep = f"{self.model_name}_{counter // save_video_episode_mod}_of_{counter_limit // save_video_episode_mod}"
+                self.net.save_model(model_name_ep)
+                logger.info(f"Saved model for rendering to {curr_model_dir + model_name_ep + model_file_ext}")
+
+                save_video_steps_ct += 1          
+            #end logging/saving/recording section
+                
+            num_total_steps += num_ep_steps     
+            num_episodes += 1
+
+            counter = num_episodes if use_episodes else num_total_steps
+
+        # Save 3/3 video
+        model_name_ep = f"{self.model_name}_{counter // save_video_episode_mod}_of_{counter_limit // save_video_episode_mod}"
+        self.net.save_model(model_name_ep)
+        logger.info(f"Saved model for rendering to {curr_model_dir + model_name_ep + model_file_ext}")
+
+        if self.seed != None:
+            logger.info(f"Reminder that gym seed set to {self.seed}")
+
+    def test(self, num_episodes=100, record_video=False):
+        # Evaluate the performance of your agent over 100 episodes, by calculating cummulative rewards for the 100 episodes.
+        # Here you need to interact with the environment, irrespective of whether you are using a memory. 
+
+        logger.info("**Testing mode")
+        
+        if record_video:
+            logger.info("Recording video from loaded files and then exiting")
+
+            # Record every episode that we run
+            self.env = gym.wrappers.Monitor(self.env, "frames/" + self.model_name, force=True, video_callable=(lambda ep_i: True), mode="evaluation")
+
+            num_episodes = 4 # 0/3, 1/3, 2/3, 3/3
+
+        logger.info("Running for {} episodes".format(num_episodes))
+
+        all_rewards = []
+        total_reward = 0    
+
+
+        self.eps = 0 #self.eps_init / 10
+        for ep_i in range(num_episodes):
+
+            if record_video:
+                logger.info(f"Loading model {self.model_name}_{ep_i}_of_{3}")
+                self.net.load_model(f"{self.model_name}_{ep_i}_of_{3}")
+
+            initial_state = self.env.reset()
+            curr_state = initial_state
+
+            ep_reward = 0
+
+            while True:
+                curr_state = curr_state.reshape((1, -1))
+                q_values = self.net.predict(curr_state)
+                action_i = self.epsilon_greedy_policy(q_values)
+
+                curr_state, reward, is_terminal, debug_info = self.env.step(action_i)
+
+                if self.render:
+                    self.env.render() 
+                    time.sleep(0.00001)
+                
+                ep_reward += reward 
+                if is_terminal:
+                    break
+
+            total_reward += ep_reward 
+            all_rewards.append(ep_reward)
+
+        average_total_reward = total_reward / num_episodes
+        reward_stdev = np.std(np.array(all_rewards))
+
+        logger.info(f"(test) Average reward per episode: {average_total_reward}")
+        logger.info(f"Standard deviation: {reward_stdev}")
+
+        return total_reward, average_total_reward
+
+
+
+    def burn_in_memory(self, rep_mem):
+
+        curr_state = self.env.reset()
+        # Initialize your replay memory with a burn_in number of episodes / transitions. 
+        for i in range(rep_mem.burn_in):
+            experience, q_values = self.take_step(curr_state, 1)
+            (prev_state, reward, action, curr_state, is_terminal) = experience
+            rep_mem.append((prev_state.copy(), reward, action, curr_state.copy(), is_terminal))
+            if is_terminal:
+                curr_state = self.env.reset()
