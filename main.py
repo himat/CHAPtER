@@ -29,6 +29,7 @@ def parse_arguments():
     parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
+    parser.add_argument('--combine',dest='combine',action="store_true")
 
 
     return parser.parse_args()
@@ -103,7 +104,11 @@ def main(args):
         num_train_steps = None
 
     else:
-        raise Exception("Invalid env")
+        gamma = 1.0
+        use_episodes = True 
+        if not args.num_eps:
+            num_train_episodes = 8000 #5000
+        num_train_steps = None
 
     if args.deepness:
         assert(args.deepness == "deep" or args.deepness == "dueling")
@@ -113,7 +118,7 @@ def main(args):
     np.random.seed(time_seed)
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
-        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn)
+        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, combine=args.combine)
 
     if args.record_video_only:
         agent.test(record_video=True)

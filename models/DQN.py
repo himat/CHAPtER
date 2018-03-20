@@ -36,14 +36,12 @@ class QNetwork():
     # The network should take in state of the world as an input, 
     # and output Q values of the actions available to the agent as the output. 
 
-    def __init__(self, environment_name, num_inputs, num_outputs, lr, deep=False):
+    def __init__(self, environment_name, num_inputs, num_outputs, lr, deep=False, combine=False):
         # Define your network architecture here. It is also a good idea to define any training operations 
         # and optimizers here, initialize your variables, or alternately compile your model here.  
         # weight_init = keras.initializers.RandomUniform(minval=-1.0, maxval=1.0)
 
         model = Sequential()
-
-        
 
         if deep == "deep":
             #weight_initializer = keras.initializers.RandomUniform(-0.05, 0.05)
@@ -131,7 +129,7 @@ class DQN_Agent():
     # (5) Create a function for Experience Replay.
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
-        model_name=None, render=False, deep=False, seed=None, alt_learn=False):
+        model_name=None, render=False, deep=False, seed=None, alt_learn=False, combine=False):
 
         global curr_model_dir
         global logger 
@@ -152,7 +150,7 @@ class DQN_Agent():
 
         num_obs = self.env.observation_space.shape[0]
         num_actions = self.env.action_space.n
-        self.net = QNetwork(environment_name, num_obs, num_actions, lr_init, deep=deep)
+        self.net = QNetwork(environment_name, num_obs, num_actions, lr_init, deep, combine)
         if test_mode:# or os.path.exists(model_name + model_file_ext):
             assert(model_name)
             self.net.load_model(model_name)
@@ -163,9 +161,8 @@ class DQN_Agent():
         self.alt_learn = alt_learn
 
         self.model_name = model_name
-        self.render = render 
-
-
+        self.render = render
+        self.combine = combine 
 
     def epsilon_greedy_policy(self, q_values):
         # Creating epsilon greedy probabilities to sample from.         
@@ -282,12 +279,10 @@ class DQN_Agent():
             while not is_terminal:
                 # self.eps = max(self.eps_init / 5, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
                 self.eps = max(0.05, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
-
-                exp_batch = []
                 
                 experience, q_values = self.take_step(curr_state, batch_size)
                 _, reward, action_i, curr_state, is_terminal = experience
-                exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
+                exp = (experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal)
 
                 if reward == 0:
                     logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
@@ -295,13 +290,13 @@ class DQN_Agent():
                 ep_reward += reward
                 num_ep_steps += 1
                 
-                train_batch = exp_batch
-                train_size = len(exp_batch)
                 if rep_batch_size:
-                    for exp in exp_batch:
-                        rep_mem.append(exp)
-                    train_batch = rep_mem.sample_batch(rep_batch_size-1)
-                    train_batch.append(exp)
+                    rep_mem.append(exp)
+                    if self.combine:
+                        train_batch = rep_mem.sample_batch(rep_batch_size-1)
+                        train_batch.append(exp)
+                    else: 
+                        train_batch = rep_mem.sample_batch(rep_batch_size)
                     train_size = rep_batch_size
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
