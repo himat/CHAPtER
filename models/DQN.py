@@ -326,7 +326,7 @@ class DQN_Agent():
                     if self.prioritized_mem:
                         train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=prioritized_mem_beta)
                     else:
-                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size)
+                        train_batch = rep_mem.sample_batch(rep_batch_size)
                     train_size = rep_batch_size
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]

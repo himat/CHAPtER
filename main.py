@@ -15,7 +15,7 @@ curr_model_dir = None
 models_dir = "models"
 
 def parse_arguments():
-	# Ex. python DQN_Implementation.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem_deep --deepness deep
+	# Ex. python DQN_Implementation.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem --deepness deep
     parser = argparse.ArgumentParser(description='Deep Q Network Argument Parser')
     parser.add_argument('--env',dest='env',type=str,required=True)
     parser.add_argument('--model-name',dest='model_name',type=str,required=True)
