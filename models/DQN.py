@@ -398,7 +398,7 @@ class DQN_Agent():
                 
 
             if num_episodes % update_target_model_eps_mod == 0:
-                logger.info(f"Updated targeted network")
+                # logger.info(f"Updated target network")
                 self.net.update_target_model()
 
             num_total_steps += num_ep_steps     
