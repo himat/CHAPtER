@@ -8,7 +8,7 @@ from random import sample
 import logging
 import time
 import os.path
-from replay.memory import Replay_Memory
+from replay.memory import Replay_Memory, Prioritized_Replay_Memory
 
 logger = None 
 
@@ -131,7 +131,8 @@ class DQN_Agent():
     # (5) Create a function for Experience Replay.
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
-        model_name=None, render=False, deep=False, seed=None, alt_learn=False):
+        model_name=None, render=False, deep=False, seed=None, alt_learn=False,
+        prioritized_mem=False):
 
         global curr_model_dir
         global logger 
@@ -164,6 +165,8 @@ class DQN_Agent():
 
         self.model_name = model_name
         self.render = render 
+
+        self.prioritized_mem = prioritized_mem
 
 
 
@@ -216,8 +219,14 @@ class DQN_Agent():
         
         for idx in range(action_i.shape[0]):
             target[idx, action_i[idx]] = y[idx]
+
         
-        return target
+        predictions = predictions.reshape((-1, 1))
+        assert(y.shape == predictions.shape)
+
+        td_errors = y - predictions 
+        
+        return target, td_errors
 
 
     def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True):
@@ -233,7 +242,10 @@ class DQN_Agent():
 
         save_episode_mod = 300
         save_steps_mod = 100000
-        
+
+        prioritized_mem_alpha = 0.6
+        prioritized_mem_beta_init = 0.4
+        prioritized_mem_beta = prioritized_mem_beta_init # TODO: anneal
         
 
         num_episodes = 0
@@ -243,7 +255,11 @@ class DQN_Agent():
         train_variance = []
 
 
-        rep_mem = Replay_Memory()
+        if self.prioritized_mem:
+            rep_mem = Prioritized_Replay_Memory(alpha=prioritized_mem_alpha)
+        else:
+            rep_mem = Replay_Memory()
+
         if rep_batch_size:
             self.burn_in_memory(rep_mem)
             # for i in range(1, 5):
@@ -306,13 +322,21 @@ class DQN_Agent():
                 if rep_batch_size:
                     for exp in exp_batch:
                         rep_mem.append(exp)
-                    train_batch = rep_mem.sample_batch(rep_batch_size)
+
+                    if self.prioritized_mem:
+                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=prioritized_mem_beta)
+                    else:
+                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size)
                     train_size = rep_batch_size
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
                 
-                curr_states, targets = exp_arr_list[0], self.calc_target(tuple(exp_arr_list))
+                curr_states = exp_arr_list[0]
+                targets, td_errors = self.calc_target(tuple(exp_arr_list))
                 self.net.train(curr_states, targets, batch_size=train_size)
+
+                if self.prioritized_mem:
+                    rep_mem.update_priorities(batch_indexes, np.abs(td_errors))
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
@@ -437,3 +461,4 @@ class DQN_Agent():
             rep_mem.append((prev_state.copy(), reward, action, curr_state.copy(), is_terminal))
             if is_terminal:
                 curr_state = self.env.reset()
+

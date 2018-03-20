@@ -30,6 +30,8 @@ def parse_arguments():
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
 
+    parser.add_argument('--prioritized_mem', dest='prioritized_mem', action="store_true")
+
 
     return parser.parse_args()
 
@@ -93,7 +95,7 @@ def main(args):
         use_episodes = False
         if not args.num_eps:
             num_train_episodes = None
-        num_train_steps = 1500000
+        num_train_steps = 900000
          
     elif env_name == "MountainCar-v0":
         gamma = 0.99
@@ -113,7 +115,8 @@ def main(args):
     np.random.seed(time_seed)
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
-        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn)
+        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn,
+        prioritized_mem=args.prioritized_mem)
 
     if args.record_video_only:
         agent.test(record_video=True)
