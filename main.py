@@ -22,13 +22,14 @@ def parse_arguments():
     parser.add_argument('--render',dest='render',action="store_true")
     parser.add_argument('--test-only',dest='test_only',action="store_true")
     parser.add_argument('--record-video-only',dest='record_video_only',action="store_true")
-    parser.add_argument('--replay-batch',dest='replay_batch',type=int)
+    parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=1024)
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
     parser.add_argument('--seed', dest='seed', type=int)
     parser.add_argument('--lr', dest='lr', type=float, default=0.0001)
     parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
+    parser.add_argument('--hindsight', action="store_true")
 
 
     return parser.parse_args()
@@ -110,17 +111,22 @@ def main(args):
 
     # You want to create an instance of the DQN_Agent class here, and then train / test it.
 
+
+    default_goal = np.array([[0.5]])
+
     np.random.seed(time_seed)
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
-        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn)
+        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, goal_size=default_goal.shape[1])
 
     if args.record_video_only:
         agent.test(record_video=True)
         return 
     
     if not args.test_only:
-        agent.train(use_episodes, num_train_episodes, num_train_steps, False if args.replay_batch == None else args.replay_batch)
+        agent.train(use_episodes, num_train_episodes, num_train_steps, 
+            False if args.replay_batch == 0 else args.replay_batch, 
+            hindsight=args.hindsight, default_goal=default_goal)
     else:
         agent.test()
 

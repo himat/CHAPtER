@@ -131,7 +131,7 @@ class DQN_Agent():
     # (5) Create a function for Experience Replay.
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
-        model_name=None, render=False, deep=False, seed=None, alt_learn=False):
+        model_name=None, render=False, deep=False, seed=None, alt_learn=False, goal_size=0):
 
         global curr_model_dir
         global logger 
@@ -152,7 +152,7 @@ class DQN_Agent():
 
         num_obs = self.env.observation_space.shape[0]
         num_actions = self.env.action_space.n
-        self.net = QNetwork(environment_name, num_obs, num_actions, lr_init, deep=deep)
+        self.net = QNetwork(environment_name, num_obs + goal_size, num_actions, lr_init, deep=deep)
         if test_mode:# or os.path.exists(model_name + model_file_ext):
             assert(model_name)
             self.net.load_model(model_name)
@@ -179,12 +179,14 @@ class DQN_Agent():
         # Creating greedy policy for test time. 
         return np.argmax(q_values)
 
-    def take_step(self, curr_state, batch_size):
+    def take_step(self, curr_state, batch_size, default_goal=None):
         curr_state = curr_state.reshape((1, -1))
         q_values = self.net.predict(curr_state)
         action_i = self.epsilon_greedy_policy(q_values)
         next_state, reward, is_terminal, debug_info = self.env.step(action_i)
         next_state = next_state.reshape((1, -1))
+        if default_goal != None:
+            next_state = np.concatenate((next_state, default_goal), axis=1)
 
         return (curr_state, reward, action_i, next_state, is_terminal), q_values
 
@@ -220,7 +222,7 @@ class DQN_Agent():
         return target
 
 
-    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True):
+    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True, hindsight=False, default_goal=None):
         # In this function, we will train our network. 
         # If training without experience replay_memory, then you will interact with the environment 
         # in this function, while also updating your network parameters. 
@@ -229,26 +231,21 @@ class DQN_Agent():
 
         batch_size = 32
         print_episode_mod = 200 # print every
-        test_episode_mod = 200
+        test_episode_mod = 200  
 
         save_episode_mod = 300
         save_steps_mod = 100000
         
-        
-
         num_episodes = 0
         num_total_steps = 0
 
         train_average = 0 
         train_variance = []
 
-
-        rep_mem = Replay_Memory()
+        rep_mem = Replay_Memory(hindsight=hindsight, default_goal=default_goal)
         if rep_batch_size:
-            self.burn_in_memory(rep_mem)
-            # for i in range(1, 5):
-            #     rep_mem.append((np.array([0.6 - i * 0.0001, i * 0.0001], shape=(1, 2)), -1.0, True, 1, np.array([0.6, i], shape=(1, 2))))
-
+            self.burn_in_memory(rep_mem, default_goal)
+       
         counter = num_episodes if use_episodes else num_total_steps
         counter_limit = episodes_limit if use_episodes else steps_limit
         save_mod = save_episode_mod if use_episodes else save_steps_mod
@@ -269,7 +266,9 @@ class DQN_Agent():
                 logger.info(f"Episode {num_episodes}")
                 logger.info(f"Step {num_total_steps}")
 
-            initial_state = self.env.reset()
+            initial_state = self.env.reset().reshape((1, -1))
+            if hindsight:
+                initial_state = np.concatenate((initial_state, default_goal), axis=1)
             curr_state = initial_state
 
             num_ep_steps = 0 
@@ -279,16 +278,17 @@ class DQN_Agent():
             is_terminal = False
 
             # Go through an episode
+            episode_exps = []
             while not is_terminal:
                 # self.eps = max(self.eps_init / 5, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
                 self.eps = max(0.05, self.eps_init * (1 - 0.8 / 100000 * ((num_ep_steps + num_total_steps))))
 
                 exp_batch = []
-                
+
                 for i in range(batch_size):
                     # exp_batch = [] # added line
 
-                    experience, q_values = self.take_step(curr_state, batch_size)
+                    experience, q_values = self.take_step(curr_state, batch_size, default_goal)
                     _, reward, action_i, curr_state, is_terminal = experience
                     exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
 
@@ -300,7 +300,8 @@ class DQN_Agent():
                 
                     if is_terminal:
                         break
-                
+                episode_exps.extend(exp_batch)
+
                 train_batch = exp_batch
                 train_size = len(exp_batch)
                 if rep_batch_size:
@@ -308,6 +309,8 @@ class DQN_Agent():
                         rep_mem.append(exp)
                     train_batch = rep_mem.sample_batch(rep_batch_size)
                     train_size = rep_batch_size
+
+                #TODO implement goal augmentation for non memory replay.
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
                 
@@ -316,6 +319,8 @@ class DQN_Agent():
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
+            if hindsight:
+                rep_mem.append_episode(episode_exps)
 
             #logging/saving/recording section
             if self.env_name == "MountainCar-v0" and ep_reward > -200:
@@ -330,7 +335,7 @@ class DQN_Agent():
                 
 
             if num_episodes % test_episode_mod == 0:
-                _, result = self.test(num_episodes=20)
+                _, result = self.test(num_episodes=20, hindsight=hindsight, default_goal=default_goal)
                 
                 if save_best:
                     if best_test == None or best_test < result:
@@ -339,12 +344,12 @@ class DQN_Agent():
                         logger.info(f"Beat previous value of {best_test}! Saved model to {curr_model_dir + model_name_ep + model_file_ext}")
                         best_test = result
             
-            if counter // save_mod > save_steps_ct:
-                model_name_ep = f"{self.model_name}_{counter // save_mod}_of_{counter_limit // save_mod}"
-                self.net.save_model(model_name_ep)
-                logger.info(f"Saved model to {curr_model_dir + model_name_ep + model_file_ext}")
+            # if counter // save_mod > save_steps_ct:
+            #     model_name_ep = f"{self.model_name}_{counter // save_mod}_of_{counter_limit // save_mod}"
+            #     self.net.save_model(model_name_ep)
+            #     logger.info(f"Saved model to {curr_model_dir + model_name_ep + model_file_ext}")
 
-                save_steps_ct += 1
+            #     save_steps_ct += 1
 
             if counter // save_video_episode_mod > save_video_steps_ct:
                 model_name_ep = f"{self.model_name}_{counter // save_video_episode_mod}_of_{counter_limit // save_video_episode_mod}"
@@ -367,7 +372,7 @@ class DQN_Agent():
         if self.seed != None:
             logger.info(f"Reminder that gym seed set to {self.seed}")
 
-    def test(self, num_episodes=100, record_video=False):
+    def test(self, num_episodes=100, record_video=False, hindsight=False, default_goal=None):
         # Evaluate the performance of your agent over 100 episodes, by calculating cummulative rewards for the 100 episodes.
         # Here you need to interact with the environment, irrespective of whether you are using a memory. 
 
@@ -394,7 +399,9 @@ class DQN_Agent():
                 logger.info(f"Loading model {self.model_name}_{ep_i}_of_{3}")
                 self.net.load_model(f"{self.model_name}_{ep_i}_of_{3}")
 
-            initial_state = self.env.reset()
+            initial_state = self.env.reset().reshape((1, -1))
+            if hindsight:
+                initial_state = np.concatenate((initial_state, default_goal), axis=1)
             curr_state = initial_state
 
             ep_reward = 0
@@ -405,6 +412,11 @@ class DQN_Agent():
                 action_i = self.epsilon_greedy_policy(q_values)
 
                 curr_state, reward, is_terminal, debug_info = self.env.step(action_i)
+
+                if hindsight:
+                    curr_state = curr_state.reshape((1, -1))
+                    curr_state = np.concatenate((curr_state, default_goal), axis=1)
+           
 
                 if self.render:
                     self.env.render() 
@@ -427,13 +439,17 @@ class DQN_Agent():
 
 
 
-    def burn_in_memory(self, rep_mem):
-
-        curr_state = self.env.reset()
+    def burn_in_memory(self, rep_mem, default_goal=None):
+        curr_state = self.env.reset().reshape((1, -1))
+        if rep_mem.hindsight:
+            curr_state = np.concatenate((curr_state, default_goal), axis=1)
         # Initialize your replay memory with a burn_in number of episodes / transitions. 
         for i in range(rep_mem.burn_in):
-            experience, q_values = self.take_step(curr_state, 1)
+            experience, q_values = self.take_step(curr_state, 1, default_goal)
             (prev_state, reward, action, curr_state, is_terminal) = experience
             rep_mem.append((prev_state.copy(), reward, action, curr_state.copy(), is_terminal))
             if is_terminal:
-                curr_state = self.env.reset()
+                curr_state = self.env.reset().reshape((1, -1))
+                if rep_mem.hindsight:
+                    curr_state = np.concatenate((curr_state, default_goal), axis=1)
+    
