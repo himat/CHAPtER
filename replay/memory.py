@@ -142,7 +142,7 @@ class Prioritized_Replay_Memory():
         assert(len(indexes) == len(new_priorities))
 
         for i, new_priority_i in zip(indexes, new_priorities):
-            assert(new_priority_i >= 0)
+            assert(new_priority_i > 0)
             assert(0 <= i < self.max_mem_size)
 
             self.sum_tree[i] = new_priority_i ** self.alpha 

@@ -17,6 +17,8 @@ curr_model_dir = None
 logs_dir = "logs"
 model_file_ext = ".h5"
 
+EPS = 1e-6
+
 # Performs the combining operation as specified by the dueling paper
 def dueling_combine(sv_adv_layer):
     import keras 
@@ -357,7 +359,7 @@ class DQN_Agent():
 
                         if self.priority_replay:
                             batch_indexes.append(placed_index)
-                            
+
                         rep_batch_size += 1
 
                     # unlock rep_batch_size
@@ -371,7 +373,7 @@ class DQN_Agent():
                 self.net.train(curr_states, targets, batch_size=train_size)
 
                 if self.priority_replay:
-                    rep_mem.update_priorities(batch_indexes, np.abs(td_errors))
+                    rep_mem.update_priorities(batch_indexes, np.abs(td_errors) + EPS)
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
