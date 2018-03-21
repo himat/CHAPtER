@@ -144,7 +144,7 @@ class DQN_Agent():
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
         model_name=None, render=False, deep=False, seed=None, alt_learn=False,
-        priority_replay=False):
+        combined_replay=False, priority_replay=False):
 
         global curr_model_dir
         global logger 
@@ -178,6 +178,7 @@ class DQN_Agent():
         self.model_name = model_name
         self.render = render 
 
+        self.combined_replay = combined_replay
         self.priority_replay = priority_replay
 
 
@@ -318,32 +319,44 @@ class DQN_Agent():
 
                 exp_batch = []
                 
-                for i in range(batch_size):
+                # for i in range(batch_size):
                     # exp_batch = [] # added line
 
-                    experience = self.take_step(curr_state, batch_size)
-                    _, reward, action_i, curr_state, is_terminal = experience
-                    exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
+                experience = self.take_step(curr_state, batch_size)
+                _, reward, action_i, curr_state, is_terminal = experience
+                exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
 
-                    if reward == 0:
-                        logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
-                    
-                    ep_reward += reward
-                    num_ep_steps += 1
+                if reward == 0:
+                    logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
                 
-                    if is_terminal:
-                        break
+                ep_reward += reward
+                num_ep_steps += 1
+            
+                # if is_terminal:
+                #     break
                 
                 train_batch = exp_batch
                 train_size = len(exp_batch)
+
                 if rep_batch_size:
                     for exp in exp_batch:
                         rep_mem.append(exp)
+
+                    # lock rep_batch_size
+                    if self.combined_replay:
+                        rep_batch_size -= 1 
 
                     if self.priority_replay:
                         train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
                     else:
                         train_batch = rep_mem.sample_batch(rep_batch_size)
+
+                    if self.combined_replay:
+                        assert(len(exp_batch) == 1)
+                        train_batch.append(exp_batch[0])
+                        rep_batch_size += 1
+                    # unlock rep_batch_size
+
                     train_size = rep_batch_size
                     
                 exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]

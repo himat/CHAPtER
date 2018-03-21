@@ -30,8 +30,8 @@ def parse_arguments():
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
 
+    parser.add_argument('--combined-replay', dest='combined_replay', action="store_true")
     parser.add_argument('--priority-replay', dest='priority_replay', action="store_true")
-
 
     return parser.parse_args()
 
@@ -116,7 +116,7 @@ def main(args):
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
         deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn,
-        priority_replay=args.priority_replay)
+        combined_replay=args.combined_replay, priority_replay=args.priority_replay)
 
     if args.record_video_only:
         agent.test(record_video=True)
