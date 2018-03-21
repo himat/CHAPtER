@@ -15,7 +15,7 @@ curr_model_dir = None
 models_dir = "models"
 
 def parse_arguments():
-	# Ex. python DQN_Implementation.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem_deep --deepness deep
+	# Ex. python main.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem --deepness deep
     parser = argparse.ArgumentParser(description='Deep Q Network Argument Parser')
     parser.add_argument('--env',dest='env',type=str,required=True)
     parser.add_argument('--model-name',dest='model_name',type=str,required=True)
@@ -29,8 +29,10 @@ def parse_arguments():
     parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     parser.add_argument('--num-eps', dest='num_eps', type=int, default=None)
+    
     parser.add_argument('--hindsight', action="store_true")
-
+    parser.add_argument('--combined-replay', dest='combined_replay', action="store_true")
+    parser.add_argument('--priority-replay', dest='priority_replay', action="store_true")
 
     return parser.parse_args()
 
@@ -40,8 +42,7 @@ def main(args):
     
     args = parse_arguments()
 
-    if args.seed != None:
-        time_seed = args.seed
+
 
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
@@ -72,10 +73,6 @@ def main(args):
 
     logger.info(f"{args}")
 
-    #set consistent seed based on time
-    time_seed = int(''.join(time_str.split('_'))) % (2 ** 32)
-    logger.info(f"Numpy random seed {time_seed}")
-
 
     env_name = args.env
 
@@ -94,7 +91,7 @@ def main(args):
         use_episodes = False
         if not args.num_eps:
             num_train_episodes = None
-        num_train_steps = 1500000
+        num_train_steps = 800000
          
     elif env_name == "MountainCar-v0":
         gamma = 0.99
@@ -114,10 +111,19 @@ def main(args):
 
     default_goal = np.array([[0.5]])
 
+    if args.seed != None:
+        time_seed = args.seed
+    else:
+        #set consistent seed based on time
+        time_seed = int(''.join(time_str.split('_'))) % (2 ** 32)
+    
     np.random.seed(time_seed)
+    logger.info(f"Numpy random seed {time_seed}")
+
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
-        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, goal_size=default_goal.shape[1])
+        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, goal_size=default_goal.shape[1],
+        combined_replay=args.combined_replay, priority_replay=args.priority_replay)
 
     if args.record_video_only:
         agent.test(record_video=True)
