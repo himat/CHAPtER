@@ -22,7 +22,7 @@ def parse_arguments():
     parser.add_argument('--render',dest='render',action="store_true")
     parser.add_argument('--test-only',dest='test_only',action="store_true")
     parser.add_argument('--record-video-only',dest='record_video_only',action="store_true")
-    parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=1024)
+    parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=32)
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
     parser.add_argument('--seed', dest='seed', type=int)
     parser.add_argument('--lr', dest='lr', type=float, default=0.0001)

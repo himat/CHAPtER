@@ -44,9 +44,11 @@ class Replay_Memory():
             assert(is_terminal)
             for experience in episode:
                 (curr_state, reward, action, next_state, is_terminal) = experience
-                is_terminal = math.isclose(next_state[0, -1], end_state[0, -1], rel_tol=1e-6)
+                is_terminal = math.isclose(next_state[0, 0], end_state[0, 0], rel_tol=1e-6)
+                # if is_terminal:
+                #     print(f"Big terminal boys")
                 curr_state = curr_state.copy()
-                curr_state[0, -1] = end_state[0, -1]
+                curr_state[0, -1] = end_state[0, 0]
                 next_state = next_state.copy()
-                next_state[0, -1] = end_state[0, -1]
+                next_state[0, -1] = end_state[0, 0]
                 self.experiences.append((curr_state, reward, action, next_state, is_terminal))

@@ -51,9 +51,9 @@ class QNetwork():
             #weight_initializer = keras.initializers.he_normal()
 
             logger.info("Using deep architecture.")
-            model.add(Dense(40, activation='relu', input_shape=(num_inputs,), kernel_initializer=weight_initializer))
-            model.add(Dense(30, activation='relu', kernel_initializer=weight_initializer))
-            model.add(Dense(30, activation='relu', kernel_initializer=weight_initializer))
+            model.add(Dense(20, activation='relu', input_shape=(num_inputs,), kernel_initializer=weight_initializer))
+            model.add(Dense(20, activation='relu', kernel_initializer=weight_initializer))
+            model.add(Dense(20, activation='relu', kernel_initializer=weight_initializer))
             model.add(Dense(num_outputs))
 
 
@@ -229,7 +229,7 @@ class DQN_Agent():
         # If you are using a replay memory, you should interact with environment here, and store these 
         # transitions to memory, while also updating your model.
 
-        batch_size = 32
+        batch_size = 1
         print_episode_mod = 200 # print every
         test_episode_mod = 200  
 

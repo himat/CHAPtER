@@ -62,6 +62,7 @@ if __name__ == '__main__':
 
   test_x, test_y = extract_test_from_log(args.log, x_label)
   train_x, train_y = extract_train_from_log(args.log, x_label)
+  train_x, train_y = train_x[1:], train_y[1:]
   xmax = max(test_x + train_x)
   ymax = max(test_y + train_y)
 
@@ -69,8 +70,8 @@ if __name__ == '__main__':
   plt.figure(figsize=(16, 12), dpi=100)
   test_plot = plt.plot(test_x, test_y, color="red", ms=25.0, label='20 episode average test reward')
   train_plot = plt.plot(train_x, train_y, color="black", ms=25.0, label='average train reward')
-  # plt.xlim(xmin=args.xmin, xmax=xmax if args.xmax == None else args.xmax)
-  # plt.ylim(ymin=args.ymin, ymax=ymax if args.ymax == None else args.ymax)
+  plt.xlim(xmin=args.xmin, xmax=xmax if args.xmax == None else args.xmax)
+  plt.ylim(ymin=args.ymin, ymax=ymax if args.ymax == None else args.ymax)
   plt.xlabel(x_label)
   plt.ylabel('Average reward')
   plt.title(args.title if args.title != None else args.log)
