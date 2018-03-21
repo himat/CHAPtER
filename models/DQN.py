@@ -339,8 +339,8 @@ class DQN_Agent():
                 train_size = len(exp_batch)
 
                 if rep_batch_size:
-                    for exp in exp_batch:
-                        rep_mem.append(exp)
+                    # for exp in exp_batch:
+                    placed_index = rep_mem.append(exp_batch[0]) 
 
                     # lock rep_batch_size
                     if self.combined_replay:
@@ -354,7 +354,9 @@ class DQN_Agent():
                     if self.combined_replay:
                         assert(len(exp_batch) == 1)
                         train_batch.append(exp_batch[0])
+                        batch_indexes.append(placed_index)
                         rep_batch_size += 1
+
                     # unlock rep_batch_size
 
                     train_size = rep_batch_size

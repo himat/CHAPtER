@@ -35,6 +35,8 @@ class Replay_Memory():
         assert(len(self.experiences) <= self.max_mem_size)
         self.mem_size = len(self.experiences)
 
+        return None 
+
 # Based on OpenAI baselines implementation 
 class Prioritized_Replay_Memory():
 
@@ -120,7 +122,11 @@ class Prioritized_Replay_Memory():
         assert(len(self.experiences) <= self.max_mem_size)
         self.mem_size = len(self.experiences)
 
+        placed_index = self.next_index
+
         self.next_index = (self.next_index + 1) % self.max_mem_size
+
+        return placed_index
 
     def update_priorities(self, indexes, new_priorities):
         assert(len(indexes) == len(new_priorities))
