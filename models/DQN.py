@@ -354,7 +354,10 @@ class DQN_Agent():
                     if self.combined_replay:
                         assert(len(exp_batch) == 1)
                         train_batch.append(exp_batch[0])
-                        batch_indexes.append(placed_index)
+
+                        if self.priority_replay:
+                            batch_indexes.append(placed_index)
+                            
                         rep_batch_size += 1
 
                     # unlock rep_batch_size
