@@ -146,7 +146,7 @@ class DQN_Agent():
     
     def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
         model_name=None, render=False, deep=False, seed=None, alt_learn=False, 
-        goal_size=0, combined_replay=False, priority_replay=False):
+        goal_size=0, combined_replay=False, priority_replay=False, hindsight_replay=False):
 
 
         global curr_model_dir
@@ -183,6 +183,7 @@ class DQN_Agent():
 
         self.combined_replay = combined_replay
         self.priority_replay = priority_replay
+        self.hindsight_replay = hindsight_replay
 
 
 
@@ -250,14 +251,15 @@ class DQN_Agent():
         return target, td_errors
 
 
-    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True, hindsight=False, default_goal=None):
+    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, save_best=True, default_goal=None):
         # In this function, we will train our network. 
         # If training without experience replay_memory, then you will interact with the environment 
         # in this function, while also updating your network parameters. 
         # If you are using a replay memory, you should interact with environment here, and store these 
         # transitions to memory, while also updating your model.
 
-        default_goal = default_goal if hindsight else None
+        assert(default_goal if self.hindsight)
+
         batch_size = 1
         print_episode_mod = 200 # print every
         test_episode_mod = 200  
@@ -278,10 +280,7 @@ class DQN_Agent():
         train_average = 0 
         train_variance = []
 
-        if self.priority_replay:
-            rep_mem = Prioritized_Replay_Memory(alpha=priority_replay_alpha)
-        else:
-            rep_mem = Replay_Memory(hindsight=hindsight, default_goal=default_goal)
+        rep_mem = Replay_Memory(prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, alpha=priority_replay_alpha)
 
         if rep_batch_size:
             self.burn_in_memory(rep_mem, default_goal)
@@ -328,7 +327,7 @@ class DQN_Agent():
                 for i in range(batch_size):
                     # exp_batch = [] # added line
 
-                    experience = self.take_step(curr_state, batch_size, default_goal if hindsight else None)
+                    experience = self.take_step(curr_state, batch_size, default_goal)
                     _, reward, action_i, curr_state, is_terminal = experience
                     exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
                     
@@ -350,20 +349,20 @@ class DQN_Agent():
                 train_size = len(exp_batch)
 
                 if rep_batch_size:
-                    # for exp in exp_batch:
-                    placed_index = rep_mem.append(exp_batch[0]) 
-
+                     
                     # lock rep_batch_size
                     if self.combined_replay:
                         rep_batch_size -= 1 
-
-                    if self.priority_replay:
-                        train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
                     else:
-                        train_batch = rep_mem.sample_batch(rep_batch_size)
+                        # Add current transition to buffer first if not using combined replay
+                        placed_index = rep_mem.append(exp_batch[0])
+
+                    # TODO: incorporate weights into loss function calculation
+                    train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
 
                     if self.combined_replay:
                         assert(len(exp_batch) == 1)
+                        placed_index = rep_mem.append(exp_batch[0])
                         train_batch.append(exp_batch[0])
 
                         if self.priority_replay:

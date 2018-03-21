@@ -108,8 +108,11 @@ def main(args):
 
     # You want to create an instance of the DQN_Agent class here, and then train / test it.
 
-
-    default_goal = np.array([[0.5]])
+    if args.hindsight:
+        assert(env_name == "MountainCar-v0")
+        default_goal = np.array([[0.5]])
+    else:
+        default_goal = None 
 
     if args.seed != None:
         time_seed = args.seed
@@ -124,7 +127,8 @@ def main(args):
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
         deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, 
         goal_size=default_goal.shape[1] if args.hindsight else 0,
-        combined_replay=args.combined_replay, priority_replay=args.priority_replay)
+        combined_replay=args.combined_replay, priority_replay=args.priority_replay,
+        hindsight_replay=args.hindsight)
 
     if args.record_video_only:
         agent.test(record_video=True)
@@ -133,7 +137,7 @@ def main(args):
     if not args.test_only:
         agent.train(use_episodes, num_train_episodes, num_train_steps, 
             False if args.replay_batch == 0 else args.replay_batch, 
-            hindsight=args.hindsight, default_goal=default_goal)
+            default_goal=default_goal)
     else:
         agent.test()
 

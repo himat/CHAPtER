@@ -12,7 +12,7 @@ def encode_samples(sample_batch):
 
 class Replay_Memory():
 
-    def __init__(self, memory_size=50000, burn_in=10000, hindsight=False, default_goal=None):
+    def __init__(self, memory_size=50000, burn_in=10000, prioritized=True, hindsight=False, default_goal=None):
 
         # The memory essentially stores transitions recorder from the agent
         # taking actions in the environment.
@@ -21,21 +21,41 @@ class Replay_Memory():
         # randomly initialized agent. Memory size is the maximum size after which old elements in the memory are replaced. 
         # A simple (if not the most efficient) was to implement the memory is as a list of transitions. 
         
+        self.prioritized = prioritized
         self.hindsight = hindsight
-        self.experiences = deque(maxlen=memory_size)
+        # self.experiences = deque(maxlen=memory_size)
+        self.experiences = []
+        self.next_index = 0
         self.burn_in = burn_in
-        self.max_mem_size = memory_size
         self.mem_size = 0
+        self.max_mem_size = memory_size
+
+        ### PER
+        if prioritized:
+            self.alpha = alpha
+            # Needs to be a power of 2
+            tree_capacity = 1 
+            while tree_capacity < self.max_mem_size:
+                tree_capacity *= 2
+
+            self.sum_tree = SumSegmentTree(tree_capacity)
+            self.min_tree = MinSegmentTree(tree_capacity)
+            self.curr_max_priority = 1.0
+
+        ### HER 
         self.default_goal = default_goal
 
-    def sample_batch(self, batch_size):
-        # This function returns a batch of randomly sampled transitions - i.e. state, action, reward, next state, terminal flag tuples. 
-        # You will feed this to your model to train.
-        samp = random.sample(self.experiences, batch_size)
-        return encode_samples(samp)
-      
-    
+    def sample_batch(self, batch_size, beta=None):
+        assert(batch_size > 0)
 
+        if self.prioritized:
+            return self._priority_sample_batch(batch_size, beta)
+        else: 
+            # Uniform sampling 
+            samp = random.sample(self.experiences, batch_size)
+            return (encode_samples(samp), None, None)
+      
+    # Adding HER goal updates
     def append_episode(self, episode):
         if self.hindsight:
             _, _, _, end_state, is_terminal = episode[-1]
@@ -49,44 +69,31 @@ class Replay_Memory():
                 curr_state[0, -1] = end_state[0, 0]
                 next_state = next_state.copy()
                 next_state[0, -1] = end_state[0, 0]
-                self.experiences.append((curr_state, reward, action, next_state, is_terminal))
+                self.append((curr_state, reward, action, next_state, is_terminal))
 
+    # Appends transition to the memory.     
     def append(self, transition):
-        # Appends transition to the memory.     
-        self.experiences.append(transition)
+
+        if len(self.experiences) < self.max_mem_size: # when the buffer hasn't reached capacity yet
+            self.experiences.append(transition)
+        else:
+            self.experiences[self.next_index] = transition 
+
         assert(len(self.experiences) <= self.max_mem_size)
         self.mem_size = len(self.experiences)
 
-        return None 
-
-# Based on OpenAI baselines implementation 
-class Prioritized_Replay_Memory():
-
-    def __init__(self, alpha, memory_size=50000, burn_in=10000):
-        """
-        alpha: float
-            prioritization weight
-            0: no prioritization (uniform sampling)
-            1: full prioritization
-        """
-
-        self.experiences = []
-        self.next_index = 0
-        self.burn_in = burn_in
-        self.mem_size = 0
-        self.max_mem_size = memory_size
-        self.alpha = alpha
-
-        # Needs to be a power of 2
-        tree_capacity = 1 
-        while tree_capacity < self.max_mem_size:
-            tree_capacity *= 2
-
-        self.sum_tree = SumSegmentTree(tree_capacity)
-        self.min_tree = MinSegmentTree(tree_capacity)
-        self.curr_max_priority = 1.0
+        # Set to highest priority 
+        if self.prioritized:
+            self.sum_tree[self.next_index] = self.curr_max_priority ** self.alpha 
+            self.min_tree[self.next_index] = self.curr_max_priority ** self.alpha 
         
+        placed_index = self.next_index
 
+        self.next_index = (self.next_index + 1) % self.max_mem_size
+
+        return placed_index
+
+    # Used for priority sampling: weighted sample from the cumulative sums
     def _sample_proportional(self, batch_size):
 
         batch = []
@@ -105,11 +112,12 @@ class Prioritized_Replay_Memory():
 
         return batch 
 
-    def sample_batch(self, batch_size, beta):
+    def _priority_sample_batch(self, batch_size, beta):
         assert(batch_size > 0 and beta > 0)
+        assert(self.prioritized)
 
         sample_indexes = self._sample_proportional(batch_size)
-        weights = []
+        sample_weights = []
 
         priority_total_sum = self.sum_tree.sum()
         N = len(self.experiences)
@@ -118,50 +126,23 @@ class Prioritized_Replay_Memory():
         p_min = self.min_tree.min() / priority_total_sum
 
         with np.errstate(divide="raise"):
-            try:
-                max_weight = (p_min * N) ** (-beta)
-            except FloatingPointError:
-                print("*" * 40)
-                print("Divide by 0")
-                print(f"p_min: {p_min}, N: {N}")
-                print(f"p_min * N: {p_min * N}")
-
-                max_weight = (p_min * N) ** (-beta)
+            max_weight = (p_min * N) ** (-beta)
 
         for index in sample_indexes:
             p_sample = self.sum_tree[index] / priority_total_sum
 
             weight = (p_sample * N) ** (-beta)
             normalized_weight = weight / max_weight
-            weights.append(normalized_weight)
+            sample_weights.append(normalized_weight)
 
         sample_experiences = [self.experiences[i] for i in sample_indexes]
 
-        return (encode_samples(sample_experiences), weights, sample_indexes)
+        return (encode_samples(sample_experiences), sample_weights, sample_indexes)
 
-
-    def append(self, transition):
-
-        if len(self.experiences) < self.max_mem_size: # when the buffer hasn't reached capacity yet
-            self.experiences.append(transition)
-        else:
-            self.experiences[self.next_index] = transition
-
-        # Set to highest priority 
-        self.sum_tree[self.next_index] = self.curr_max_priority ** self.alpha 
-        self.min_tree[self.next_index] = self.curr_max_priority ** self.alpha 
-
-        assert(len(self.experiences) <= self.max_mem_size)
-        self.mem_size = len(self.experiences)
-
-        placed_index = self.next_index
-
-        self.next_index = (self.next_index + 1) % self.max_mem_size
-
-        return placed_index
-
+    # Updating PER priorities 
     def update_priorities(self, indexes, new_priorities):
         assert(len(indexes) == len(new_priorities))
+        assert(self.prioritized)
 
         for i, new_priority_i in zip(indexes, new_priorities):
             assert(new_priority_i > 0)
@@ -171,3 +152,5 @@ class Prioritized_Replay_Memory():
             self.min_tree[i] = new_priority_i ** self.alpha 
 
             self.curr_max_priority = max(self.curr_max_priority, new_priority_i)
+
+        
