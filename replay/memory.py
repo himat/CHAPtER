@@ -12,7 +12,7 @@ def encode_samples(sample_batch):
 
 class Replay_Memory():
 
-    def __init__(self, memory_size=50000, burn_in=10000, prioritized=True, hindsight=False, default_goal=None):
+    def __init__(self, memory_size=50000, burn_in=10000, prioritized=True, hindsight=False, default_goal=None, priority_alpha=None):
 
         # The memory essentially stores transitions recorder from the agent
         # taking actions in the environment.
@@ -32,7 +32,8 @@ class Replay_Memory():
 
         ### PER
         if prioritized:
-            self.alpha = alpha
+            assert(priority_alpha)
+            self.alpha = priority_alpha
             # Needs to be a power of 2
             tree_capacity = 1 
             while tree_capacity < self.max_mem_size:

@@ -8,7 +8,7 @@ from random import sample
 import logging
 import time
 import os.path
-from replay.memory import Replay_Memory, Prioritized_Replay_Memory
+from replay.memory import Replay_Memory
 
 logger = None 
 
@@ -185,6 +185,13 @@ class DQN_Agent():
         self.priority_replay = priority_replay
         self.hindsight_replay = hindsight_replay
 
+        if combined_replay:
+            logger.info("Using combined replay")
+        if priority_replay: 
+            logger.info("Using prioritized replay") 
+        if hindsight_replay:
+            logger.info("Using hindsight replay") 
+
 
 
     def epsilon_greedy_policy(self, q_values):
@@ -258,7 +265,8 @@ class DQN_Agent():
         # If you are using a replay memory, you should interact with environment here, and store these 
         # transitions to memory, while also updating your model.
 
-        assert(default_goal if self.hindsight)
+        if self.hindsight_replay:
+            assert(default_goal)
 
         batch_size = 1
         print_episode_mod = 200 # print every
@@ -280,7 +288,7 @@ class DQN_Agent():
         train_average = 0 
         train_variance = []
 
-        rep_mem = Replay_Memory(prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, alpha=priority_replay_alpha)
+        rep_mem = Replay_Memory(prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
 
         if rep_batch_size:
             self.burn_in_memory(rep_mem, default_goal)
@@ -306,7 +314,7 @@ class DQN_Agent():
                 logger.info(f"Step {num_total_steps}")
 
             initial_state = self.env.reset().reshape((1, -1))
-            if hindsight:
+            if self.hindsight_replay:
                 initial_state = np.concatenate((initial_state, default_goal), axis=1)
             curr_state = initial_state
 
@@ -387,7 +395,7 @@ class DQN_Agent():
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
-            if hindsight:
+            if self.hindsight_replay:
                 rep_mem.append_episode(episode_exps)
 
 
@@ -404,7 +412,7 @@ class DQN_Agent():
                 
 
             if num_episodes % test_episode_mod == 0:
-                _, result = self.test(num_episodes=20, hindsight=hindsight, default_goal=default_goal)
+                _, result = self.test(num_episodes=20, hindsight=self.hindsight_replay, default_goal=default_goal)
                 
                 if save_best:
                     if best_test == None or best_test < result:
