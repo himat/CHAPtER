@@ -41,8 +41,7 @@ def main(args):
     
     args = parse_arguments()
 
-    if args.seed != None:
-        time_seed = args.seed
+
 
     if not os.path.exists(models_dir):
         os.makedirs(models_dir)
@@ -72,10 +71,6 @@ def main(args):
     #end logging settings
 
     logger.info(f"{args}")
-
-    #set consistent seed based on time
-    time_seed = int(''.join(time_str.split('_'))) % (2 ** 32)
-    logger.info(f"Numpy random seed {time_seed}")
 
 
     env_name = args.env
@@ -111,8 +106,15 @@ def main(args):
         assert(args.deepness == "deep" or args.deepness == "dueling")
 
     # You want to create an instance of the DQN_Agent class here, and then train / test it.
-
+    if args.seed != None:
+        time_seed = args.seed
+    else:
+        #set consistent seed based on time
+        time_seed = int(''.join(time_str.split('_'))) % (2 ** 32)
+    
     np.random.seed(time_seed)
+    logger.info(f"Numpy random seed {time_seed}")
+
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
         deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn,
