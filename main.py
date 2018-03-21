@@ -97,7 +97,7 @@ def main(args):
         gamma = 0.99
         use_episodes = True 
         if not args.num_eps:
-            num_train_episodes = 8000 #5000
+            num_train_episodes = 5000 # 8000
         num_train_steps = None
 
     else:
