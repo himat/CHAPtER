@@ -257,6 +257,7 @@ class DQN_Agent():
         # If you are using a replay memory, you should interact with environment here, and store these 
         # transitions to memory, while also updating your model.
 
+        default_goal = default_goal if hindsight else None
         batch_size = 1
         print_episode_mod = 200 # print every
         test_episode_mod = 200  
@@ -327,7 +328,7 @@ class DQN_Agent():
                 for i in range(batch_size):
                     # exp_batch = [] # added line
 
-                    experience = self.take_step(curr_state, batch_size, default_goal)
+                    experience = self.take_step(curr_state, batch_size, default_goal if hindsight else None)
                     _, reward, action_i, curr_state, is_terminal = experience
                     exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
                     
