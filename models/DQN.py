@@ -142,21 +142,14 @@ class DQN_Agent():
         # as well as training parameters - number of episodes / iterations, etc. 
         self.env_name = environment_name
         self.env = gym.make(environment_name)
-        self.env = gym.wrappers.FlattenDictWrapper(self.env, dict_keys=['observation', 'desired_goal', 'achieved_goal'])
 
         if seed != None:
             logger.info(f"Gym seed set to {seed}")
             self.env.seed(seed)
         self.seed = seed
 
-        if (self.env_name == "CartPole-v0" or self.env_name == "MountainCar-v0"):
-            num_obs = self.env.observation_space.shape[0]
-        elif (self.env_name == "FetchReach-v0"):
-            num_obs = self.env.observation_space.shape[0]
-        if (self.env_name == "CartPole-v0" or self.env_name == "MountainCar-v0"):
-            num_actions = self.env.action_space.n
-        elif (self.env_name == "FetchReach-v0"):
-            num_actions = self.env.action_space.shape[0]
+        num_obs = self.env.observation_space.shape[0]
+        num_actions = self.env.action_space.n
         self.net = QNetwork(environment_name, num_obs, num_actions, lr_init, deep, combine)
         if test_mode:# or os.path.exists(model_name + model_file_ext):
             assert(model_name)
@@ -290,6 +283,9 @@ class DQN_Agent():
                 experience, q_values = self.take_step(curr_state, batch_size)
                 _, reward, action_i, curr_state, is_terminal = experience
                 exp = (experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal)
+
+                if reward == 0:
+                    logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
                     
                 ep_reward += reward
                 num_ep_steps += 1
