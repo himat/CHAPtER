@@ -71,9 +71,6 @@ def main(args):
 
     #end logging settings
 
-    logger.info(f"{args}")
-
-
     env_name = args.env
 
     # Setting the session to allow growth, so it doesn't allocate all GPU memory. 
@@ -83,6 +80,9 @@ def main(args):
 
     # Setting this as the default tensorflow session. 
     keras.backend.tensorflow_backend.set_session(sess)
+
+    logger.info(f"{args}")
+    logger.info(f"Log saved to {log_file_name}")
 
     num_train_episodes = args.num_eps
 
