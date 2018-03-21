@@ -104,6 +104,8 @@ class Prioritized_Replay_Memory():
                 print(f"p_min: {p_min}, N: {N}")
                 print(f"p_min * N: {p_min * N}")
 
+                max_weight = (p_min * N) ** (-beta)
+
         for index in sample_indexes:
             p_sample = self.sum_tree[index] / priority_total_sum
 
