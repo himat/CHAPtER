@@ -94,7 +94,15 @@ class Prioritized_Replay_Memory():
 
         # For normalization
         p_min = self.min_tree.min() / priority_total_sum
-        max_weight = (p_min * N) ** (-beta)
+
+        with np.errstate(divide="raise"):
+            try:
+                max_weight = (p_min * N) ** (-beta)
+            except FloatingPointError:
+                print("*" * 40)
+                print("Divide by 0")
+                print(f"p_min: {p_min}, N: {N}")
+                print(f"p_min * N: {p_min * N}")
 
         for index in sample_indexes:
             p_sample = self.sum_tree[index] / priority_total_sum
