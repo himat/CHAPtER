@@ -122,7 +122,8 @@ def main(args):
 
     agent = DQN_Agent(curr_model_dir, logger, env_name, gamma, eps_init=args.epsilon, lr_init=args.lr, 
         render=args.render, test_mode=args.test_only, model_name=args.model_name, 
-        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, goal_size=default_goal.shape[1],
+        deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, 
+        goal_size=default_goal.shape[1] if args.hindsight else 0,
         combined_replay=args.combined_replay, priority_replay=args.priority_replay)
 
     if args.record_video_only:
