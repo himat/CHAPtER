@@ -9,8 +9,6 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from reinforce import Reinforce
-
 from keras.models import Sequential, Model
 from keras.layers import Dense
 
@@ -23,10 +21,22 @@ import statistics
 logger = None 
 MODEL_DIR = "models"
 
-class A2C(Reinforce):
+class A2C():
     # Implementation of N-step Advantage Actor Critic.
     # This class inherits the Reinforce class, so for example, you can reuse
     # generate_episode() here.
+
+    def create_actor_model(self, num_inputs, num_outputs):
+        weight_initializer = keras.initializers.glorot_uniform()
+
+        model = Sequential()
+
+        model.add(Dense(16, activation='relu', input_shape=(num_inputs,), kernel_initializer=weight_initializer))
+        model.add(Dense(16, activation='relu', kernel_initializer=weight_initializer))
+        model.add(Dense(16, activation='relu', kernel_initializer=weight_initializer))
+        model.add(Dense(num_outputs, activation='softmax', kernel_initializer=weight_initializer))
+
+        return model        
 
     def create_critic_model(self, num_inputs, num_outputs):
         weight_initializer = keras.initializers.glorot_uniform()
@@ -40,7 +50,7 @@ class A2C(Reinforce):
 
         return model
 
-    def __init__(self, model, model_lr, model_weights, critic_model, critic_lr, num_inputs, N=20):
+    def __init__(self, env, model_name, actor_model, actor_lr, critic_model, critic_lr, N=20, logger=None):
         # Initializes A2C.
         # Args:
         # - model: The actor model.
@@ -48,12 +58,20 @@ class A2C(Reinforce):
         # - critic_model: The critic model.
         # - critic_lr: Learning rate for the critic model.
         # - n: The value of N in N-step A2C.
-        self.model = model
-        if model_weights:
-            self.model.load_weights(model_weights)
 
-        model_opt = keras.optimizers.adam(lr=model_lr)
-        self.model.compile(loss=keras.losses.categorical_crossentropy, optimizer=model_opt)
+        self.env = env 
+        self.model_name = model_name
+        self.N = N
+
+        num_inputs = env.observation_space.shape[0]
+        num_outputs = env.action_space.n 
+
+        if actor_model:
+            self.actor_model = keras.models.load_model(actor_model)
+        else:
+            self.actor_model = self.create_actor_model(num_inputs=num_inputs, num_outputs=num_outputs)
+            actor_opt = keras.optimizers.adam(lr=actor_lr)
+            self.actor_model.compile(loss=keras.losses.categorical_crossentropy, optimizer=actor_opt)
 
         if critic_model:
             self.critic_model = keras.models.load_model(critic_model)
@@ -62,15 +80,17 @@ class A2C(Reinforce):
             critic_opt = keras.optimizers.adam(lr=critic_lr)
             self.critic_model.compile(loss=keras.losses.mean_squared_error, optimizer=critic_opt)
 
+        logger.info("Actor model:")
+        self.actor_model.summary(print_fn=lambda x: logger.info(x))
         logger.info("Critic model:")
         self.critic_model.summary(print_fn=lambda x: logger.info(x))
-        self.N = N
+        
+        
 
 
-    def train(self, env, num_eps, batch_size=1, gamma=1.0, 
+    def train(self, num_eps, batch_size=1, gamma=0.99, 
                 r_mod_factor=0.01,
-                report_interval=100, test_interval=500, render=False,
-                model_name="default"):
+                report_interval=100, test_interval=500, render=False):
 
         report_goals = []
         best_score = None 
@@ -84,7 +104,7 @@ class A2C(Reinforce):
 
             critic_values = []
             for _ in range(batch_size):
-                states_ep, actions_ep, rewards_ep = self.generate_episode(env, render=render)
+                states_ep, actions_ep, rewards_ep = self.generate_episode(render=render)
                 report_goals.append(sum(rewards_ep))
                 rewards_ep = list(map(lambda x: x * r_mod_factor, rewards_ep))
 
@@ -125,15 +145,15 @@ class A2C(Reinforce):
                     logger.info(f"Std: {statistics.stdev(report_goals)}")
                 report_goals = []
             if ep % test_interval == 0:
-                total_reward = self.test(env, alt_logger=logger, render=render)
+                total_reward = self.test(alt_logger=logger, render=render)
                 if best_score == None or total_reward > best_score:
                     logger.info(f"New best reward of {total_reward}")
                     if best_score != None: 
                         logger.info(f"Beat old reward of {best_score}")
                     best_score = total_reward 
                     best_score_epoch = ep
-                self.model.save_weights(f"{MODEL_DIR}/{model_name}_{ep}.h5")
-                self.critic_model.save(f"{MODEL_DIR}/{model_name}_Critic_{ep}.h5")
+                self.actor_model.save(f"{MODEL_DIR}/{self.model_name}_Actor_{ep}.h5")
+                self.critic_model.save(f"{MODEL_DIR}/{self.model_name}_Critic_{ep}.h5")
 
             
             action_vecs = np.concatenate(actions, axis=0)
@@ -147,8 +167,65 @@ class A2C(Reinforce):
 
         logger.info(f"Best score: {best_score} at epoch {best_score_epoch}")
 
+    def generate_episode(self, render=False):
+        # Generates an episode by executing the current policy in the given env.
+        # Returns:
+        # - a list of states, indexed by time step
+        # - a list of actions, indexed by time step
+        # - a list of rewards, indexed by time step
+        states = []
+        actions = []
+        rewards = []
+        curr_state = self.env.reset()
+        is_terminal = False
+
+        while(not is_terminal):
+
+            curr_state = curr_state.reshape((1, -1))
+            action_values = self.actor_model.predict(curr_state)
+
+            action_i = np.random.choice(self.env.action_space.n, 1, p=action_values[0,:])[0]
+
+            new_state, reward, is_terminal, debug_info = self.env.step(action_i)
+
+            if render:
+                self.env.render() 
+                time.sleep(0.00001)
+
+            one_hot_action = keras.utils.to_categorical(action_i, num_classes=self.env.action_space.n).reshape((1,-1))
+            
+            states.append(curr_state)
+            actions.append(one_hot_action)
+            rewards.append(reward)
+
+            curr_state = new_state
+
+        return states, actions, rewards
+
+    def test(self, num_eps=100, alt_logger=None, render=False):
+        global logger 
+        if alt_logger:
+            logger = alt_logger 
+
+        total_reward = []
+        for _ in range(num_eps):
+            is_terminal = False
+            curr_state = self.env.reset().reshape((1, -1))
+            ep_reward = 0
+            while (not is_terminal):
+                action_values = self.actor_model.predict(curr_state)
+                action_i = np.argmax(action_values)
+                curr_state, reward, is_terminal, _ = self.env.step(action_i)
+                ep_reward += reward
+                curr_state = curr_state.reshape((1, -1))
+            total_reward.append(ep_reward)
+
+        logger.info(f"Test reward mean: {sum(total_reward) / num_eps}")
+        logger.info(f"Test reward std: {statistics.stdev(total_reward)}")
+        return sum(total_reward) / num_eps    
 
 
+# TODO: remove this function
 def parse_arguments():
     # Command-line flags are defined here.
     parser = argparse.ArgumentParser()
@@ -184,65 +261,3 @@ def parse_arguments():
 
     return parser.parse_args()
 
-
-def main(args):
-    global logger
-    # Setup logger
-    formatter = logging.Formatter('%(asctime)s - %(message)s')
-    os.environ['TZ'] = 'EST+05EDT,M4.1.0,M10.5.0'
-    time.tzset()    
-    time_str = time.strftime('%Y_%m_%d_%H_%M_%S')
-    log_file_name = f'logs/{time_str}.log'
-
-    logger = logging.getLogger("10703")
-    logger.setLevel(logging.DEBUG)
-
-    hdlr = logging.FileHandler(log_file_name)
-    hdlr.setLevel(logging.INFO)
-    hdlr.setFormatter(formatter)
-    logger.addHandler(hdlr)
-
-    hdlr2 = logging.StreamHandler(sys.stdout)
-    hdlr2.setLevel(logging.DEBUG)
-    hdlr.setFormatter(formatter)
-    logger.addHandler(hdlr2)
-    # end setup logger
-
-    # Parse command-line arguments.
-    args = parse_arguments()
-    logger.info("A2C")
-    logger.info(f"Log file: {log_file_name}")
-    logger.info(f"Command line args:\n{args}")
-
-    model_config_path = args.model_config_path
-    model_weights_path = args.model_weights_path 
-    num_episodes = args.num_episodes
-    model_lr = args.model_lr
-    critic_model_path = args.critic_model_path
-    critic_lr = args.critic_lr
-    gamma = args.gamma 
-    n = args.n
-    render = args.render
-
-    # Create the environment.
-    env = gym.make('LunarLander-v2')
-    
-    # Load the actor model from file.
-    with open(model_config_path, 'r') as f:
-        model = keras.models.model_from_json(f.read())
-
-    # TODO: Plot the learning curves.
-
-    a2c = A2C(model, model_lr, model_weights_path, critic_model_path, critic_lr, num_inputs=env.observation_space.shape[0], N=n)
-    
-    if args.test_only:
-        logger.info("TESTING MODE")
-        test_reward = a2c.test(env, alt_logger=logger, render=render)
-        print(f"Testing reward: {test_reward}")
-    else:
-        a2c.train(env, num_episodes, gamma=gamma, model_name=args.model_name)
-
-    logger.info(f"Log file: {log_file_name}")
-
-if __name__ == '__main__':
-    main(sys.argv)

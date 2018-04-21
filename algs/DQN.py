@@ -38,7 +38,7 @@ class QNetwork():
     # The network should take in state of the world as an input, 
     # and output Q values of the actions available to the agent as the output. 
 
-    def __init__(self, environment_name, num_inputs, num_outputs, lr, deep=False):
+    def __init__(self, num_inputs, num_outputs, lr, deep=False):
         # Define your network architecture here. It is also a good idea to define any training operations 
         # and optimizers here, initialize your variables, or alternately compile your model here.  
         # weight_init = keras.initializers.RandomUniform(minval=-1.0, maxval=1.0)
@@ -144,7 +144,7 @@ class DQN_Agent():
     # (4) Create a function to test the Q Network's performance on the environment.
     # (5) Create a function for Experience Replay.
     
-    def __init__(self, c_model_dir, c_logger, environment_name, gamma, lr_init, eps_init=0.5, test_mode=False, 
+    def __init__(self, c_model_dir, c_logger, env, gamma, lr_init, eps_init=0.5, test_mode=False, 
         model_name=None, render=False, deep=False, seed=None, alt_learn=False, 
         goal_size=0, combined_replay=False, priority_replay=False, hindsight_replay=False):
 
@@ -158,8 +158,7 @@ class DQN_Agent():
         # Create an instance of the network itself, as well as the memory. 
         # Here is also a good place to set environmental parameters,
         # as well as training parameters - number of episodes / iterations, etc. 
-        self.env_name = environment_name
-        self.env = gym.make(environment_name)
+        self.env = env
 
         if seed != None:
             logger.info(f"Gym seed set to {seed}")
@@ -168,7 +167,7 @@ class DQN_Agent():
 
         num_obs = self.env.observation_space.shape[0]
         num_actions = self.env.action_space.n
-        self.net = QNetwork(environment_name, num_obs + goal_size, num_actions, lr_init, deep=deep)
+        self.net = QNetwork(num_obs + goal_size, num_actions, lr_init, deep=deep)
         if test_mode:# or os.path.exists(model_name + model_file_ext):
             assert(model_name)
             self.net.load_model(model_name)
@@ -400,7 +399,7 @@ class DQN_Agent():
 
 
             #logging/saving/recording section
-            if self.env_name == "MountainCar-v0" and ep_reward > -200:
+            if self.env.name == "MountainCar-v0" and ep_reward > -200:
                 logger.info(f"*****Got better reward: {ep_reward} on ep {num_episodes}")
 
             train_average += ep_reward / print_episode_mod
@@ -535,3 +534,34 @@ class DQN_Agent():
                 if rep_mem.hindsight:
                     curr_state = np.concatenate((curr_state, default_goal), axis=1)
     
+def create_dqn(args, env, default_goal, curr_model_dir, time_seed):
+    env_name = args.env_name 
+
+    if args.deepness:
+        assert(args.deepness == "deep" or args.deepness == "dueling")
+
+    if env_name == "CartPole-v0":
+        num_train_episodes = args.num_eps
+        gamma = 1.0
+        use_episodes = False
+        if not args.num_eps:
+            num_train_episodes = None
+        num_train_steps = 800000
+         
+    elif env_name == "MountainCar-v0":
+        num_train_episodes = args.num_eps
+        gamma = 0.99
+        use_episodes = True 
+        if not args.num_eps:
+            num_train_episodes = 5000 # 8000
+        num_train_steps = None
+
+
+    agent = DQN_Agent(curr_model_dir, logger, env, gamma, eps_init=args.epsilon, lr_init=args.lr, 
+            render=args.render, test_mode=args.test_only, model_name=args.model_name, 
+            deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, 
+            goal_size=default_goal.shape[1] if args.hindsight else 0,
+            combined_replay=args.combined_replay, priority_replay=args.priority_replay,
+            hindsight_replay=args.hindsight)
+
+    return agent, num_train_episodes, num_train_steps 
