@@ -41,6 +41,7 @@ def extract_train_from_log(log_path, x_label):
 
 
 if __name__ == '__main__':
+
   parser = argparse.ArgumentParser(description='Log Parser')
   parser.add_argument('log', type=str)
   parser.add_argument('--xmin', type=int, default=0)
@@ -71,7 +72,7 @@ if __name__ == '__main__':
   test_plot = plt.plot(test_x, test_y, color="red", ms=25.0, label='20 episode average test reward')
   train_plot = plt.plot(train_x, train_y, color="black", ms=25.0, label='average train reward')
   plt.xlim(xmin=args.xmin, xmax=xmax if args.xmax == None else args.xmax)
-  plt.ylim(ymin=args.ymin, ymax=ymax if args.ymax == None else args.ymax)
+  # plt.ylim(ymin=args.ymin, ymax=ymax if args.ymax == None else args.ymax)
   plt.xlabel(x_label)
   plt.ylabel('Average reward')
   plt.title(args.title if args.title != None else args.log)
