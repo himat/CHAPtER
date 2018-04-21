@@ -62,6 +62,7 @@ class A2C():
         self.env = env 
         self.model_name = model_name
         self.N = N
+        self.logger = logger
 
         num_inputs = env.observation_space.shape[0]
         num_outputs = env.action_space.n 
@@ -139,17 +140,17 @@ class A2C():
                 assert(len(states) == len(summed_rewards))
 
             if ep % report_interval == 0:
-                logger.info(f"{'-'*10}Episode {ep}")
-                logger.info(f"Average reward: {sum(report_goals) / report_interval / batch_size}")
+                self.logger.info(f"{'-'*10}Episode {ep}")
+                self.logger.info(f"Average reward: {sum(report_goals) / report_interval / batch_size}")
                 if ep > 0:
-                    logger.info(f"Std: {statistics.stdev(report_goals)}")
+                    self.logger.info(f"Std: {statistics.stdev(report_goals)}")
                 report_goals = []
             if ep % test_interval == 0:
                 total_reward = self.test(alt_logger=logger, render=render)
                 if best_score == None or total_reward > best_score:
-                    logger.info(f"New best reward of {total_reward}")
+                    self.logger.info(f"New best reward of {total_reward}")
                     if best_score != None: 
-                        logger.info(f"Beat old reward of {best_score}")
+                        self.logger.info(f"Beat old reward of {best_score}")
                     best_score = total_reward 
                     best_score_epoch = ep
                 self.actor_model.save(f"{MODEL_DIR}/{self.model_name}_Actor_{ep}.h5")
@@ -162,10 +163,10 @@ class A2C():
             target_vecs = goal_vec * action_vecs 
             rewards_vecs = np.array(summed_rewards).reshape((-1,1))
 
-            self.model.fit(state_vecs, target_vecs, batch_size=len(states), verbose=0)
+            self.actor_model.fit(state_vecs, target_vecs, batch_size=len(states), verbose=0)
             self.critic_model.fit(state_vecs, rewards_vecs, batch_size=len(states), verbose=0)
 
-        logger.info(f"Best score: {best_score} at epoch {best_score_epoch}")
+        self.logger.info(f"Best score: {best_score} at epoch {best_score_epoch}")
 
     def generate_episode(self, render=False):
         # Generates an episode by executing the current policy in the given env.
@@ -220,8 +221,8 @@ class A2C():
                 curr_state = curr_state.reshape((1, -1))
             total_reward.append(ep_reward)
 
-        logger.info(f"Test reward mean: {sum(total_reward) / num_eps}")
-        logger.info(f"Test reward std: {statistics.stdev(total_reward)}")
+        self.logger.info(f"Test reward mean: {sum(total_reward) / num_eps}")
+        self.logger.info(f"Test reward std: {statistics.stdev(total_reward)}")
         return sum(total_reward) / num_eps    
 
 
