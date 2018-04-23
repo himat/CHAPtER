@@ -13,10 +13,8 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
-from reinforce import Reinforce
 
-
-class A2C(Reinforce):
+class A2C():
     # Implementation of N-step Advantage Actor Critic.
     # This class inherits the Reinforce class, so for example, you can reuse
     # generate_episode() here.
@@ -44,7 +42,7 @@ class A2C(Reinforce):
         self.error = np.array([])
         self.file_name = "output_" + str(time.time()) + "_" + str(self.n)
         # TODO: Define any training operations and optimizers here, initialize
-        #       your variables, or alternately compile your model here.  
+        #       your variables, or alternately compile your model here.
 
     def loss_func(self, target, pred):
         epsilon = 1e-7
@@ -138,7 +136,7 @@ class A2C(Reinforce):
             plt.xlabel("Episodes")
             plt.ylabel("Average Reward Per 100 Episodes")
             plt.savefig(self.file_name + '.png')
-        return (mean, std) 
+        return (mean, std)
 
 def parse_arguments():
     # Command-line flags are defined here.
@@ -180,7 +178,7 @@ def main(args):
 
     # Create the environment.
     env = gym.make('LunarLander-v2')
-    
+
     # Load the actor model from file.
     with open(model_config_path, 'r') as f:
         model = keras.models.model_from_json(f.read())
