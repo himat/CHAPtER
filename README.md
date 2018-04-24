@@ -1,4 +1,4 @@
-# HHiPER
-Hierarchical Hindsight Prioritized Experience Replay
+# CHAPtER
+Combined Hindsight Adaptive Prioritized Experience Replay
 
-Adding prioritized replay to Hierarchical Actor Critic
+Combining and evaluating recent advances in improved experience replay buffer learning.
