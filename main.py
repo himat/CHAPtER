@@ -21,7 +21,7 @@ dqn_model = "algs/DQN.py"
 def parse_arguments():
 	# Ex. python main.py --env CartPole-v0 --replay-batch 32 --model-name cartpole_dqn_w_mem --deepness deep
     parser = argparse.ArgumentParser(description='Experience Replay Argument Parser')
-    parser.add_argument('--env',dest='env',type=str, default="LunarLander-v2")
+    parser.add_argument('--env-name',dest='env_name',type=str, default="LunarLander-v2")
     parser.add_argument('--alg', type=str, default="a2c", help="a2c or dqn")
     parser.add_argument('--model-name',dest='model_name',type=str,required=True)
 
@@ -51,6 +51,7 @@ def parse_arguments():
 
     # DQN 
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
+    parser.add_argument('--lr',dest='lr',type=int,default=0.0001)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     
     # ER
@@ -103,7 +104,7 @@ def main(args):
     # Setting this as the default tensorflow session. 
     keras.backend.tensorflow_backend.set_session(sess)
 
-    assert(args.env in ["CartPole-v0", "MountainCar-v0", "LunarLander-v2"])
+    #assert(args.env in ["CartPole-v0", "MountainCar-v0", "LunarLander-v2"])
     assert(args.alg in ["a2c", "dqn"])
 
     logger.info(f"Command line args: {args}")
@@ -111,9 +112,8 @@ def main(args):
     logger.info(f"Alg: {args.alg}")
     
 
-    env_name = args.env
     if args.hindsight:
-        assert(env_name == "MountainCar-v0")
+        assert(args.env_name == "MountainCar-v0")
         default_goal = np.array([[0.5]])
     else:
         default_goal = None 
@@ -127,7 +127,7 @@ def main(args):
     np.random.seed(time_seed)
     logger.info(f"Numpy random seed {time_seed}")
 
-    env = gym.make(env_name)
+    env = gym.make(args.env_name)
     num_inputs = env.observation_space.shape[0]
     num_outputs = env.action_space.n
     print(f"Num env inputs (state space): {num_inputs}")
@@ -136,8 +136,7 @@ def main(args):
     if args.alg == "a2c":
         agent = A2C(env, args.model_name, args.actor_model_path, args.actor_lr, args.critic_model_path, args.critic_lr, N=args.N, logger=logger)
     elif args.alg == "dqn":
-        agent, num_train_episodes, num_train_steps = create_dqn(args, env, default_goal, curr_model_dir, time_seed)
-
+        agent, use_episodes, num_train_episodes, num_train_steps = create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
 
     if args.record_video_only:
         agent.test(record_video=True)

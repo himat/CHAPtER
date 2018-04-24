@@ -3,3 +3,7 @@ plots/
 *.h5
 *.pyc
 .DS_Store
+pybox2d/
+*.npy
+*.png
+gym/

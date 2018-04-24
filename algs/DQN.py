@@ -399,8 +399,8 @@ class DQN_Agent():
 
 
             #logging/saving/recording section
-            if self.env.name == "MountainCar-v0" and ep_reward > -200:
-                logger.info(f"*****Got better reward: {ep_reward} on ep {num_episodes}")
+            #if self.env.name == "MountainCar-v0" and ep_reward > -200:
+            #    logger.info(f"*****Got better reward: {ep_reward} on ep {num_episodes}")
 
             train_average += ep_reward / print_episode_mod
             train_variance += [ep_reward]
@@ -534,28 +534,28 @@ class DQN_Agent():
                 if rep_mem.hindsight:
                     curr_state = np.concatenate((curr_state, default_goal), axis=1)
     
-def create_dqn(args, env, default_goal, curr_model_dir, time_seed):
-    env_name = args.env_name 
+def create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed):
+    env_name = args.env_name
+    logger = logger
 
     if args.deepness:
         assert(args.deepness == "deep" or args.deepness == "dueling")
 
     if env_name == "CartPole-v0":
-        num_train_episodes = args.num_eps
+        num_train_episodes = args.num_episodes
         gamma = 1.0
         use_episodes = False
-        if not args.num_eps:
+        if not args.num_episodes:
             num_train_episodes = None
         num_train_steps = 800000
          
     elif env_name == "MountainCar-v0":
-        num_train_episodes = args.num_eps
+        num_train_episodes = args.num_episodes
         gamma = 0.99
         use_episodes = True 
-        if not args.num_eps:
+        if not args.num_episodes:
             num_train_episodes = 5000 # 8000
         num_train_steps = None
-
 
     agent = DQN_Agent(curr_model_dir, logger, env, gamma, eps_init=args.epsilon, lr_init=args.lr, 
             render=args.render, test_mode=args.test_only, model_name=args.model_name, 
@@ -564,4 +564,4 @@ def create_dqn(args, env, default_goal, curr_model_dir, time_seed):
             combined_replay=args.combined_replay, priority_replay=args.priority_replay,
             hindsight_replay=args.hindsight)
 
-    return agent, num_train_episodes, num_train_steps 
+    return agent, use_episodes, num_train_episodes, num_train_steps 
