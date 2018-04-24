@@ -341,8 +341,8 @@ class DQN_Agent():
                     if is_terminal:
                         break
                
-                if reward == 0:
-                    logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
+                #if reward == 0:
+                #    logger.info("NOTICE THIS: Yay reached the top " + "*"*100);
                 
                 episode_exps.extend(exp_batch)
 
@@ -550,6 +550,14 @@ def create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed):
         num_train_steps = 800000
          
     elif env_name == "MountainCar-v0":
+        num_train_episodes = args.num_episodes
+        gamma = 0.99
+        use_episodes = True 
+        if not args.num_episodes:
+            num_train_episodes = 5000 # 8000
+        num_train_steps = None
+
+    else: 
         num_train_episodes = args.num_episodes
         gamma = 0.99
         use_episodes = True 
