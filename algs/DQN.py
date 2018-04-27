@@ -306,8 +306,8 @@ class DQN_Agent():
             assert(default_goal)
 
         batch_size = 1
-        print_episode_mod = 20 # print every
-        test_episode_mod = 20  
+        print_episode_mod = 100 # print every
+        test_episode_mod = 100  
 
         save_episode_mod = 300
         save_steps_mod = 100000
@@ -454,7 +454,7 @@ class DQN_Agent():
                 
 
             if num_episodes % test_episode_mod == 0:
-                _, result = self.test(num_episodes=20, hindsight=self.hindsight_replay, default_goal=default_goal)
+                _, result = self.test(num_episodes=50, hindsight=self.hindsight_replay, default_goal=default_goal)
                 
                 if save_best:
                     if best_test == None or best_test < result:
