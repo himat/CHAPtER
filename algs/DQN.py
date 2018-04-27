@@ -432,7 +432,7 @@ class DQN_Agent():
                 targets, td_errors = self.calc_target(tuple(exp_arr_list))
                 self.net.train(curr_states, targets, batch_size=train_size)
 
-                if self.priority_replay:
+                if rep_batch_size and self.priority_replay:
                     rep_mem.update_priorities(batch_indexes, np.abs(td_errors) + EPS)
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
