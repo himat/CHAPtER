@@ -3,12 +3,13 @@ import keras, tensorflow as tf, numpy as np, gym, sys, copy, argparse
 import time
 import keras.backend as K
 from keras.models import Sequential, Model
-from keras.layers import Input, Dense, Activation, Lambda 
+from keras.layers import Input, Dense, Activation, Lambda, Conv2D, Flatten
 from random import sample
 import logging
 import time
 import os.path
 from replay.memory import Replay_Memory
+import cv2
 
 logger = None 
 
@@ -31,6 +32,8 @@ def dueling_combine(sv_adv_layer):
     adv_mean = keras.backend.mean(advantage, axis=1, keepdims=True)
     
     return state_value + (advantage - adv_mean)
+
+
 
 class QNetwork():
 
@@ -85,6 +88,23 @@ class QNetwork():
             model = Model(inputs=inputs, outputs=q_values)
 
 
+        elif deep == "atari":
+
+            logger.info("Using atari architecture.")
+
+            inputs = Input(shape=(84, 84, 3))
+            conv1 = Conv2D(32,8, strides=(4,4), padding='valid', activation='relu')(inputs)
+            conv2 = Conv2D(64,4, strides=(2,2), padding='valid', activation='relu')(conv1)
+            conv3 = Conv2D(64,3, strides=(1,1), padding='valid', activation='relu')(conv2)
+            flatten = Flatten()(conv3)
+
+            advantage = Dense(512)(flatten)
+            advantage = Dense(num_outputs)(advantage)
+            state_value = Dense(512)(flatten)
+            state_value = Dense(1)(state_value)
+            q_values = Lambda(dueling_combine, output_shape=(num_outputs,))([state_value, advantage])
+
+            model = Model(inputs=inputs, output=q_values)
         else:
             logger.info("Using linear architecture.")
 
@@ -108,13 +128,13 @@ class QNetwork():
         self.num_actions = num_outputs
         
     def predict(self, x):
-        assert(x.ndim == 2)
+        #assert(x.ndim == 2)
 
         batch_size = x.shape[0]
         return self.model.predict(x, batch_size), self.target_model.predict(x, batch_size)
 
     def train(self, x, y, batch_size=1):
-        assert(x.ndim == 2)
+        #assert(x.ndim == 2)
 
         assert(x.shape[0] == y.shape[0])
         assert(y.shape[1] == self.num_actions)
@@ -167,6 +187,7 @@ class DQN_Agent():
 
         num_obs = self.env.observation_space.shape[0]
         num_actions = self.env.action_space.n
+        self.deep = deep
         self.net = QNetwork(num_obs + goal_size, num_actions, lr_init, deep=deep)
         if test_mode:# or os.path.exists(model_name + model_file_ext):
             assert(model_name)
@@ -184,6 +205,9 @@ class DQN_Agent():
         self.priority_replay = priority_replay
         self.hindsight_replay = hindsight_replay
 
+        if self.deep == "atari":
+        	self.process_buffer = []
+
         if combined_replay:
             logger.info("Using combined replay")
         if priority_replay: 
@@ -191,7 +215,13 @@ class DQN_Agent():
         if hindsight_replay:
             logger.info("Using hindsight replay") 
 
-
+    def convert_process_buffer(self):
+	    """Converts the list of NUM_FRAMES images in the process buffer
+	    into one training sample"""
+	    black_buffer = [cv2.resize(cv2.cvtColor(x, cv2.COLOR_RGB2GRAY), (84, 90)) for x in self.process_buffer]
+	    black_buffer = [x[1:85, :, np.newaxis] for x in black_buffer]
+	    converted = np.concatenate(black_buffer, axis=2)
+	    return np.expand_dims(converted, axis=0)
 
     def epsilon_greedy_policy(self, q_values):
         # Creating epsilon greedy probabilities to sample from.         
@@ -206,11 +236,19 @@ class DQN_Agent():
         return np.argmax(q_values)
 
     def take_step(self, curr_state, batch_size, default_goal=None):
-        curr_state = curr_state.reshape((1, -1))
+        if self.deep == "atari":
+            curr_state = self.convert_process_buffer()
+        else: 
+            curr_state = curr_state.reshape((1, -1))
         q_values_pred, q_values_target = self.net.predict(curr_state)
         action_i = self.epsilon_greedy_policy(q_values_pred)
         next_state, reward, is_terminal, debug_info = self.env.step(action_i)
-        next_state = next_state.reshape((1, -1))
+        if self.deep == "atari":
+        	self.process_buffer.append(next_state)
+        	self.process_buffer = self.process_buffer[1:]
+        	next_state = self.convert_process_buffer()
+        else:
+        	next_state = next_state.reshape((1, -1))
         if default_goal != None:
             next_state = np.concatenate((next_state, default_goal), axis=1)
 
@@ -268,8 +306,8 @@ class DQN_Agent():
             assert(default_goal)
 
         batch_size = 1
-        print_episode_mod = 200 # print every
-        test_episode_mod = 200  
+        print_episode_mod = 20 # print every
+        test_episode_mod = 20  
 
         save_episode_mod = 300
         save_steps_mod = 100000
@@ -290,6 +328,7 @@ class DQN_Agent():
         rep_mem = Replay_Memory(prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
 
         if rep_batch_size:
+            logger.info("Burning in memory.")
             self.burn_in_memory(rep_mem, default_goal)
        
         counter = num_episodes if use_episodes else num_total_steps
@@ -312,7 +351,11 @@ class DQN_Agent():
                 logger.info(f"Episode {num_episodes}")
                 logger.info(f"Step {num_total_steps}")
 
-            initial_state = self.env.reset().reshape((1, -1))
+            if self.deep == "atari":
+                initial_state = self.env.reset()
+                self.process_buffer = [initial_state, initial_state.copy(), initial_state.copy()]
+            else:
+                initial_state = self.env.reset().reshape((1,-1))
             if self.hindsight_replay:
                 initial_state = np.concatenate((initial_state, default_goal), axis=1)
             curr_state = initial_state
@@ -335,7 +378,7 @@ class DQN_Agent():
                     # exp_batch = [] # added line
 
                     experience = self.take_step(curr_state, batch_size, default_goal)
-                    _, reward, action_i, curr_state, is_terminal = experience
+                    prev_state, reward, action_i, curr_state, is_terminal = experience
                     exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
                     
                     if is_terminal:
@@ -383,7 +426,7 @@ class DQN_Agent():
 
                 #TODO implement goal augmentation for non memory replay.
                     
-                exp_arr_list = [np.reshape(np.array([exp[i] for exp in train_batch]), (train_size, -1)) for i in range(5)]
+                exp_arr_list = [np.vstack(np.array([exp[i] for exp in train_batch])) for i in range(5)]
                 
                 curr_states = exp_arr_list[0]
                 targets, td_errors = self.calc_target(tuple(exp_arr_list))
@@ -453,7 +496,7 @@ class DQN_Agent():
         if self.seed != None:
             logger.info(f"Reminder that gym seed set to {self.seed}")
 
-    def test(self, num_episodes=100, record_video=False, hindsight=False, default_goal=None):
+    def test(self, num_episodes=4, record_video=False, hindsight=False, default_goal=None):
         # Evaluate the performance of your agent over 100 episodes, by calculating cummulative rewards for the 100 episodes.
         # Here you need to interact with the environment, irrespective of whether you are using a memory. 
 
@@ -480,23 +523,33 @@ class DQN_Agent():
                 logger.info(f"Loading model {self.model_name}_{ep_i}_of_{3}")
                 self.net.load_model(f"{self.model_name}_{ep_i}_of_{3}")
 
-            initial_state = self.env.reset().reshape((1, -1))
+            if self.deep == "atari":
+                initial_state = self.env.reset()
+                self.process_buffer = [initial_state, initial_state.copy(), initial_state.copy()]
+            else:
+                initial_state = self.env.reset().reshape((1,-1))
             if hindsight:
                 initial_state = np.concatenate((initial_state, default_goal), axis=1)
             curr_state = initial_state
-
             ep_reward = 0
 
             while True:
-                curr_state = curr_state.reshape((1, -1))
+                if self.deep == "atari":
+                	curr_state = self.convert_process_buffer()
+                else:
+                    curr_state = curr_state.reshape((1, -1))
                 q_values_pred, q_values_target = self.net.predict(curr_state)
-                action_i = self.epsilon_greedy_policy(q_values_pred)
+                action_i = self.greedy_policy(q_values_pred)
 
-                curr_state, reward, is_terminal, debug_info = self.env.step(action_i)
+                next_state, reward, is_terminal, debug_info = self.env.step(action_i)
+
+                if self.deep == "atari":
+                	self.process_buffer.append(next_state)
+                	self.process_buffer = self.process_buffer[1:]
 
                 if hindsight:
-                    curr_state = curr_state.reshape((1, -1))
-                    curr_state = np.concatenate((curr_state, default_goal), axis=1)
+                    next_state = next_state.reshape((1, -1))
+                    next_state = np.concatenate((next_state, default_goal), axis=1)
            
 
                 if self.render:
@@ -521,7 +574,11 @@ class DQN_Agent():
 
 
     def burn_in_memory(self, rep_mem, default_goal=None):
-        curr_state = self.env.reset().reshape((1, -1))
+        if self.deep == "atari":
+            initial_state, _, _, _ = self.env.reset()
+            self.process_buffer = [initial_state, initial_state.copy(), initial_state.copy()]
+        else:
+            curr_state = self.env.reset().reshape((1, -1))
         if rep_mem.hindsight:
             curr_state = np.concatenate((curr_state, default_goal), axis=1)
         # Initialize your replay memory with a burn_in number of episodes / transitions. 
@@ -539,7 +596,7 @@ def create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed):
     logger = logger
 
     if args.deepness:
-        assert(args.deepness == "deep" or args.deepness == "dueling")
+        assert(args.deepness == "deep" or args.deepness == "dueling" or args.deepness == "atari")
 
     if env_name == "CartPole-v0":
         num_train_episodes = args.num_episodes

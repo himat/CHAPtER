@@ -149,8 +149,9 @@ def main(args):
             agent.train(args.num_episodes, gamma=args.gamma, test_interval=args.test_mod, render=args.render)
         elif args.alg == "dqn":
             agent.train(use_episodes, num_train_episodes, num_train_steps, 
-            False if args.replay_batch == 0 else args.replay_batch, 
-            default_goal=default_goal)
+            False, default_goal=default_goal)
+            #False if args.replay_batch == 0 else args.replay_batch, 
+            #default_goal=default_goal)
         
 
     logger.info(f"Log saved to {log_file_name}")
