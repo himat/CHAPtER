@@ -51,7 +51,7 @@ def parse_arguments():
     # DQN 
     parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
-    parser.add_argument('--lr',dest='lr',type=int,default=0.0001)
+    parser.add_argument('--lr',dest='lr',type=float,default=0.0001)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
     
     # ER
