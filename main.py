@@ -146,9 +146,9 @@ def main(args):
         agent.test()
     else:
         if args.alg == "a2c":
-            assert !args.priority_replay, "NYI"
-            assert !args.combined_replay, "NYI"
-            assert !args.hindsight, "NYI"
+            assert not args.priority_replay, "NYI"
+            assert not args.combined_replay, "NYI"
+            assert not args.hindsight, "NYI"
             agent.train(args.num_episodes, gamma=args.gamma, test_interval=args.test_mod, render=args.render)
         elif args.alg == "dqn":
             agent.train(use_episodes, num_train_episodes, num_train_steps, 
