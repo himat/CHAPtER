@@ -29,12 +29,13 @@ def parse_arguments():
     parser.add_argument('--num-episodes', dest='num_episodes', type=int,
                         default=50000, help="Number of episodes to train on.")
     parser.add_argument('--gamma', type=float, default=0.99)
-    parser.add_argument('--test-mod', type=int, default=500, help="Test every x number of episodes")
 
     # Utils
     parser.add_argument('--render', dest='render', action="store_true")
     parser.add_argument('--record-video-only',dest='record_video_only',action="store_true")
     parser.add_argument('--test-only', action="store_true")
+    parser.add_argument('--train-mod', type=int, default=100, help="Print every x number of episodes")
+    parser.add_argument('--test-mod', type=int, default=500, help="Test every x number of episodes")
 
     # A2C 
     parser.add_argument('--actor-model-path', type=str, default=None,
@@ -149,10 +150,12 @@ def main(args):
             assert not args.priority_replay, "NYI"
             assert not args.combined_replay, "NYI"
             assert not args.hindsight, "NYI"
-            agent.train(args.num_episodes, gamma=args.gamma, test_interval=args.test_mod, render=args.render)
+            agent.train(args.num_episodes, gamma=args.gamma, 
+                report_interval=args.train_mod, test_interval=args.test_mod, render=args.render)
         elif args.alg == "dqn":
             agent.train(use_episodes, num_train_episodes, num_train_steps, 
-            False if args.replay_batch == 0 else args.replay_batch, 
+            rep_batch_size = False if args.replay_batch == 0 else args.replay_batch, 
+            print_episode_mod=args.train_mod, test_episode_mod=args.test_mod,
             default_goal=default_goal)
         
 
