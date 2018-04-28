@@ -26,14 +26,13 @@ def parse_arguments():
     parser.add_argument('--model-name',dest='model_name',type=str,required=True)
 
     parser.add_argument('--seed', dest='seed', type=int)
-    parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--num-episodes', dest='num_episodes', type=int,
                         default=50000, help="Number of episodes to train on.")
     parser.add_argument('--gamma', type=float, default=0.99)
     parser.add_argument('--test-mod', type=int, default=500, help="Test every x number of episodes")
 
     # Utils
-    parser.add_argument('--render',dest='render',action="store_true")
+    parser.add_argument('--render', dest='render', action="store_true")
     parser.add_argument('--record-video-only',dest='record_video_only',action="store_true")
     parser.add_argument('--test-only', action="store_true")
 
@@ -41,15 +40,16 @@ def parse_arguments():
     parser.add_argument('--actor-model-path', type=str, default=None,
                         help="Path to the actor model file.")
     parser.add_argument('--actor-lr', type=float,
-                        default=1e-4, help="The actor's learning rate.")
+                        default=0.01, help="The actor's learning rate.")
     parser.add_argument('--critic-model-path', type=str, default=None)
     parser.add_argument('--critic-lr', type=float,
-                        default=1e-4, help="The critic's learning rate.")
+                        default=0.01, help="The critic's learning rate.")
     
     parser.add_argument('--N', dest='N', type=int,
-                        default=20, help="The number of steps in N-step A2C.")
+                        default=50, help="The number of steps in N-step A2C.")
 
     # DQN 
+    parser.add_argument('--epsilon', dest='epsilon', type=float, default=0.5)
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
     parser.add_argument('--lr',dest='lr',type=int,default=0.0001)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
@@ -146,6 +146,9 @@ def main(args):
         agent.test()
     else:
         if args.alg == "a2c":
+            assert !args.priority_replay, "NYI"
+            assert !args.combined_replay, "NYI"
+            assert !args.hindsight, "NYI"
             agent.train(args.num_episodes, gamma=args.gamma, test_interval=args.test_mod, render=args.render)
         elif args.alg == "dqn":
             agent.train(use_episodes, num_train_episodes, num_train_steps, 
