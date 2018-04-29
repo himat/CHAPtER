@@ -211,7 +211,7 @@ class DQN_Agent():
         action_i = self.epsilon_greedy_policy(q_values_pred)
         next_state, reward, is_terminal, debug_info = self.env.step(action_i)
         next_state = next_state.reshape((1, -1))
-        if default_goal != None:
+        if default_goal is not None:
             next_state = np.concatenate((next_state, default_goal), axis=1)
 
         return (curr_state, reward, action_i, next_state, is_terminal) 
@@ -257,7 +257,8 @@ class DQN_Agent():
         return target, td_errors
 
 
-    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, print_episode_mod=200, test_episode_mod=200, save_best=True, default_goal=None):
+    def train(self, use_episodes, episodes_limit, steps_limit, rep_batch_size=False, print_episode_mod=200, test_episode_mod=200, save_best=True,
+                    replay_mem_size=50000, default_goal=None):
         # In this function, we will train our network. 
         # If training without experience replay_memory, then you will interact with the environment 
         # in this function, while also updating your network parameters. 
@@ -265,7 +266,7 @@ class DQN_Agent():
         # transitions to memory, while also updating your model.
 
         if self.hindsight_replay:
-            assert(default_goal)
+            assert(default_goal is not None)
 
         batch_size = 1
 
@@ -285,7 +286,8 @@ class DQN_Agent():
         train_average = 0 
         train_variance = []
 
-        rep_mem = Replay_Memory(prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
+        logger.info(f"Creating replay buffer with initial max size of {replay_mem_size}")
+        rep_mem = Replay_Memory(memory_size=replay_mem_size, prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
 
         if rep_batch_size:
             self.burn_in_memory(rep_mem, default_goal)
@@ -392,6 +394,7 @@ class DQN_Agent():
                     
                 if (not use_episodes and (num_total_steps + num_ep_steps) > steps_limit):
                     break
+
             if self.hindsight_replay:
                 rep_mem.append_episode(episode_exps)
 
@@ -408,7 +411,7 @@ class DQN_Agent():
                 train_average, train_variance = (0, [])
                 
 
-            if num_episodes % test_episode_mod == 0:
+            if num_episodes % test_episode_mod == 0 and num_episodes > 0:
                 _, result = self.test(num_episodes=20, hindsight=self.hindsight_replay, default_goal=default_goal)
                 
                 if save_best:
@@ -519,14 +522,17 @@ class DQN_Agent():
 
 
     def burn_in_memory(self, rep_mem, default_goal=None):
+        logger.info(f"Burning in {rep_mem.burn_in} lines")
         curr_state = self.env.reset().reshape((1, -1))
         if rep_mem.hindsight:
             curr_state = np.concatenate((curr_state, default_goal), axis=1)
+            
         # Initialize your replay memory with a burn_in number of episodes / transitions. 
         for i in range(rep_mem.burn_in):
             experience = self.take_step(curr_state, 1, default_goal)
             (prev_state, reward, action, curr_state, is_terminal) = experience
             rep_mem.append((prev_state.copy(), reward, action, curr_state.copy(), is_terminal))
+
             if is_terminal:
                 curr_state = self.env.reset().reshape((1, -1))
                 if rep_mem.hindsight:

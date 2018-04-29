@@ -23,6 +23,7 @@ class Replay_Memory():
         
         self.prioritized = prioritized
         self.hindsight = hindsight
+
         # self.experiences = deque(maxlen=memory_size)
         self.experiences = []
         self.next_index = 0
@@ -45,6 +46,7 @@ class Replay_Memory():
 
         ### HER 
         self.default_goal = default_goal
+        self.goal_dim = default_goal.shape[1] if default_goal is not None else None # How many dimensions the goal is defined over
 
     def sample_batch(self, batch_size, beta=None):
         assert(batch_size > 0)
@@ -58,18 +60,21 @@ class Replay_Memory():
       
     # Adding HER goal updates
     def append_episode(self, episode):
+        
         if self.hindsight:
             _, _, _, end_state, is_terminal = episode[-1]
             assert(is_terminal)
+            
             for experience in episode:
                 (curr_state, reward, action, next_state, is_terminal) = experience
-                is_terminal = math.isclose(next_state[0, 0], end_state[0, 0], rel_tol=1e-6)
+
+                is_terminal = np.allclose(next_state[0, 0:self.goal_dim], end_state[0, 0:self.goal_dim], rtol=1e-6)
                 # if is_terminal:
                 #     print(f"Big terminal boys")
                 curr_state = curr_state.copy()
-                curr_state[0, -1] = end_state[0, 0]
+                curr_state[0, -self.goal_dim:] = end_state[0, 0:self.goal_dim]
                 next_state = next_state.copy()
-                next_state[0, -1] = end_state[0, 0]
+                next_state[0, -self.goal_dim:] = end_state[0, 0:self.goal_dim]
                 self.append((curr_state, reward, action, next_state, is_terminal))
 
     # Appends transition to the memory.     

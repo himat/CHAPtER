@@ -30,6 +30,8 @@ def parse_arguments():
                         default=50000, help="Number of episodes to train on.")
     parser.add_argument('--gamma', type=float, default=0.99)
 
+    parser.add_argument('--memory-size', type=int, default=50000, help="ER buffer initial max size")
+
     # Utils
     parser.add_argument('--render', dest='render', action="store_true")
     parser.add_argument('--record-video-only',dest='record_video_only',action="store_true")
@@ -114,8 +116,13 @@ def main(args):
     
 
     if args.hindsight:
-        assert(args.env_name == "MountainCar-v0")
-        default_goal = np.array([[0.5]])
+        if args.env_name == "MountainCar-v0":
+            default_goal = np.array([[0.5]]) # flag at x = 0.5
+        elif args.env_name == "LunarLander-v2":
+            default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
+        else:
+            raise ValueError("Hindsight not enabled for this env")
+
     else:
         default_goal = None 
 
@@ -156,7 +163,7 @@ def main(args):
             agent.train(use_episodes, num_train_episodes, num_train_steps, 
             rep_batch_size = False if args.replay_batch == 0 else args.replay_batch, 
             print_episode_mod=args.train_mod, test_episode_mod=args.test_mod,
-            default_goal=default_goal)
+            replay_mem_size=args.memory_size, default_goal=default_goal)
         
 
     logger.info(f"Log saved to {log_file_name}")
