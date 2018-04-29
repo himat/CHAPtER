@@ -12,7 +12,7 @@ def encode_samples(sample_batch):
 
 class Replay_Memory():
 
-    def __init__(self, memory_size=50000, burn_in=10000, prioritized=True, hindsight=False, default_goal=None, priority_alpha=None):
+    def __init__(self, memory_size=50000, burn_in=10000, combined=False, prioritized=False, hindsight=False, default_goal=None, priority_alpha=None):
 
         # The memory essentially stores transitions recorder from the agent
         # taking actions in the environment.
@@ -21,6 +21,7 @@ class Replay_Memory():
         # randomly initialized agent. Memory size is the maximum size after which old elements in the memory are replaced. 
         # A simple (if not the most efficient) was to implement the memory is as a list of transitions. 
         
+        self.combined = combined
         self.prioritized = prioritized
         self.hindsight = hindsight
 
@@ -48,15 +49,41 @@ class Replay_Memory():
         self.default_goal = default_goal
         self.goal_dim = default_goal.shape[1] if default_goal is not None else None # How many dimensions the goal is defined over
 
-    def sample_batch(self, batch_size, beta=None):
+    # Returns a batch_size set of experiences, and also (optionally) adds a new experience to the buffer
+    # If using combined replay, you have to pass in the new_exp
+    def sample_batch(self, batch_size, new_exp=None, beta=None):
         assert(batch_size > 0)
 
+        ret_batch = None
+        sample_weights = None 
+        sample_indexes = None 
+
+        if self.combined:
+            batch_size -= 1 
+        else:
+            if new_exp is not None: 
+                latest_exp_index = self.append(new_exp) # Add to buffer 
+
         if self.prioritized:
-            return self._priority_sample_batch(batch_size, beta)
+            ret_batch, sample_weights, sample_indexes = self._priority_sample_batch(batch_size, beta)
+
         else: 
             # Uniform sampling 
-            samp = random.sample(self.experiences, batch_size)
-            return (encode_samples(samp), None, None)
+            ret_batch = random.sample(self.experiences, batch_size)
+
+        # Add latest experience to return sample
+        if self.combined:
+            assert(new_exp is not None) # Need to have passed in the newest sample
+
+            # Adding after so that there's no chance of double sampling this experience 
+            latest_exp_index = self.append(new_exp) # Add to buffer 
+            ret_batch.append(new_exp) 
+
+            if self.prioritized:
+                sample_weights.append(1.0) # weight of 1 sounds good
+                sample_indexes.append(latest_exp_index)
+
+        return (encode_samples(ret_batch), sample_weights, sample_indexes)
       
     # Adding HER goal updates
     def append_episode(self, episode):
@@ -122,8 +149,8 @@ class Replay_Memory():
         assert(batch_size > 0 and beta > 0)
         assert(self.prioritized)
 
-        sample_indexes = self._sample_proportional(batch_size)
         sample_weights = []
+        sample_indexes = self._sample_proportional(batch_size)
 
         priority_total_sum = self.sum_tree.sum()
         N = len(self.experiences)

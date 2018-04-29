@@ -287,7 +287,7 @@ class DQN_Agent():
         train_variance = []
 
         logger.info(f"Creating replay buffer with initial max size of {replay_mem_size}")
-        rep_mem = Replay_Memory(memory_size=replay_mem_size, prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
+        rep_mem = Replay_Memory(memory_size=replay_mem_size, combined=self.combined_replay, prioritized=self.priority_replay, hindsight=self.hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
 
         if rep_batch_size:
             self.burn_in_memory(rep_mem, default_goal)
@@ -357,27 +357,10 @@ class DQN_Agent():
 
                 if rep_batch_size:
                      
-                    # lock rep_batch_size
-                    if self.combined_replay:
-                        rep_batch_size -= 1 
-                    else:
-                        # Add current transition to buffer first if not using combined replay
-                        placed_index = rep_mem.append(exp_batch[0])
-
+                    assert(len(exp_batch) == 1)
+                
                     # TODO: incorporate weights into loss function calculation
-                    train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
-
-                    if self.combined_replay:
-                        assert(len(exp_batch) == 1)
-                        placed_index = rep_mem.append(exp_batch[0])
-                        train_batch.append(exp_batch[0])
-
-                        if self.priority_replay:
-                            batch_indexes.append(placed_index)
-
-                        rep_batch_size += 1
-
-                    # unlock rep_batch_size
+                    train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, new_exp=exp_batch[0], beta=priority_replay_beta)
 
                     train_size = rep_batch_size
 
@@ -526,7 +509,7 @@ class DQN_Agent():
         curr_state = self.env.reset().reshape((1, -1))
         if rep_mem.hindsight:
             curr_state = np.concatenate((curr_state, default_goal), axis=1)
-            
+
         # Initialize your replay memory with a burn_in number of episodes / transitions. 
         for i in range(rep_mem.burn_in):
             experience = self.take_step(curr_state, 1, default_goal)
