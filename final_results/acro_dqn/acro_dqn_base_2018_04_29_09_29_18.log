@@ -1,0 +1,1118 @@
+2018-04-29 09:29:19,376 - This is acrobot DQN baseline
+2018-04-29 09:29:19,376 - Command line args: Namespace(N=50, actor_lr=0.01, actor_model_path=None, alg='dqn', alt_learn=False, combined_replay=False, critic_lr=0.01, critic_model_path=None, deepness='deep', env_name='Acrobot-v1', epsilon=0.5, gamma=0.99, hindsight=False, lr=0.0001, model_name='acro_dqn_base', num_episodes=50000, priority_replay=False, record_video_only=False, render=False, replay_batch=32, seed=None, test_mod=500, test_only=False, train_mod=100)
+2018-04-29 09:29:19,376 - Log saving to logs/acro_dqn_base_2018_04_29_09_29_18.log
+2018-04-29 09:29:19,376 - Alg: dqn
+2018-04-29 09:29:19,377 - Numpy random seed 2672736310
+2018-04-29 09:29:19,380 - Gym seed set to 2672736310
+2018-04-29 09:29:19,381 - Using deep architecture.
+2018-04-29 09:29:19,449 - Using initial learning rate 0.0001
+2018-04-29 09:29:47,267 - Training for 50000 episodes
+2018-04-29 09:29:47,268 - Episode 0
+2018-04-29 09:29:47,268 - Step 0
+2018-04-29 09:29:55,191 - Episode reward mean: -5.000
+2018-04-29 09:29:55,191 - Episode reward std: 49.500
+2018-04-29 09:29:55,192 - **Testing mode
+2018-04-29 09:29:55,192 - Running for 20 episodes
+2018-04-29 09:30:22,635 - (test) Average reward per episode: -500.0
+2018-04-29 09:30:22,635 - Standard deviation: 0.0
+2018-04-29 09:30:22,728 - Beat previous value of None! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 09:30:22,755 - Saved model for rendering to models/acro_dqn_base/acro_dqn_base_0_of_3.h5
+2018-04-29 09:41:44,600 - Episode 100
+2018-04-29 09:41:44,601 - Step 48447
+2018-04-29 09:41:51,718 - Episode reward mean: -484.320
+2018-04-29 09:41:51,718 - Episode reward std: 46.284
+2018-04-29 09:52:14,970 - Episode 200
+2018-04-29 09:52:14,971 - Step 92976
+2018-04-29 09:52:16,671 - Episode reward mean: -441.180
+2018-04-29 09:52:16,671 - Episode reward std: 110.154
+2018-04-29 10:02:12,938 - Episode 300
+2018-04-29 10:02:12,938 - Step 135265
+2018-04-29 10:02:20,022 - Episode reward mean: -426.320
+2018-04-29 10:02:20,022 - Episode reward std: 111.920
+2018-04-29 10:10:03,051 - Episode 400
+2018-04-29 10:10:03,051 - Step 168498
+2018-04-29 10:10:06,292 - Episode reward mean: -329.010
+2018-04-29 10:10:06,292 - Episode reward std: 152.640
+2018-04-29 10:20:53,509 - Episode 500
+2018-04-29 10:20:53,509 - Step 214653
+2018-04-29 10:21:00,520 - Episode reward mean: -464.110
+2018-04-29 10:21:00,520 - Episode reward std: 94.029
+2018-04-29 10:21:00,520 - **Testing mode
+2018-04-29 10:21:00,521 - Running for 20 episodes
+2018-04-29 10:21:27,452 - (test) Average reward per episode: -500.0
+2018-04-29 10:21:27,452 - Standard deviation: 0.0
+2018-04-29 10:30:41,011 - Episode 600
+2018-04-29 10:30:41,011 - Step 254708
+2018-04-29 10:30:48,058 - Episode reward mean: -400.030
+2018-04-29 10:30:48,058 - Episode reward std: 115.046
+2018-04-29 10:36:00,016 - Episode 700
+2018-04-29 10:36:00,016 - Step 277397
+2018-04-29 10:36:01,656 - Episode reward mean: -222.170
+2018-04-29 10:36:01,656 - Episode reward std: 130.861
+2018-04-29 10:43:35,037 - Episode 800
+2018-04-29 10:43:35,037 - Step 309483
+2018-04-29 10:43:36,766 - Episode reward mean: -320.190
+2018-04-29 10:43:36,767 - Episode reward std: 144.616
+2018-04-29 10:54:21,325 - Episode 900
+2018-04-29 10:54:21,326 - Step 355096
+2018-04-29 10:54:28,363 - Episode reward mean: -459.730
+2018-04-29 10:54:28,363 - Episode reward std: 95.116
+2018-04-29 11:05:21,800 - Episode 1000
+2018-04-29 11:05:21,800 - Step 401723
+2018-04-29 11:05:28,069 - Episode reward mean: -465.460
+2018-04-29 11:05:28,070 - Episode reward std: 84.614
+2018-04-29 11:05:28,070 - **Testing mode
+2018-04-29 11:05:28,070 - Running for 20 episodes
+2018-04-29 11:05:55,098 - (test) Average reward per episode: -500.0
+2018-04-29 11:05:55,098 - Standard deviation: 0.0
+2018-04-29 11:12:45,129 - Episode 1100
+2018-04-29 11:12:45,129 - Step 431153
+2018-04-29 11:12:48,389 - Episode reward mean: -291.440
+2018-04-29 11:12:48,389 - Episode reward std: 148.459
+2018-04-29 11:19:12,663 - Episode 1200
+2018-04-29 11:19:12,664 - Step 458654
+2018-04-29 11:19:16,301 - Episode reward mean: -274.540
+2018-04-29 11:19:16,302 - Episode reward std: 144.093
+2018-04-29 11:22:28,338 - Episode 1300
+2018-04-29 11:22:28,339 - Step 472610
+2018-04-29 11:22:29,827 - Episode reward mean: -137.000
+2018-04-29 11:22:29,828 - Episode reward std: 61.912
+2018-04-29 11:25:10,027 - Episode 1400
+2018-04-29 11:25:10,027 - Step 484125
+2018-04-29 11:25:11,350 - Episode reward mean: -114.040
+2018-04-29 11:25:11,350 - Episode reward std: 29.731
+2018-04-29 11:28:25,925 - Episode 1500
+2018-04-29 11:28:25,925 - Step 497365
+2018-04-29 11:28:27,332 - Episode reward mean: -131.470
+2018-04-29 11:28:27,334 - Episode reward std: 53.828
+2018-04-29 11:28:27,334 - **Testing mode
+2018-04-29 11:28:27,334 - Running for 20 episodes
+2018-04-29 11:28:37,434 - (test) Average reward per episode: -186.45
+2018-04-29 11:28:37,434 - Standard deviation: 159.40027446651402
+2018-04-29 11:28:37,462 - Beat previous value of -500.0! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 11:31:13,119 - Episode 1600
+2018-04-29 11:31:13,120 - Step 508542
+2018-04-29 11:31:14,410 - Episode reward mean: -110.670
+2018-04-29 11:31:14,410 - Episode reward std: 35.792
+2018-04-29 11:33:28,426 - Episode 1700
+2018-04-29 11:33:28,426 - Step 518177
+2018-04-29 11:33:30,492 - Episode reward mean: -95.920
+2018-04-29 11:33:30,492 - Episode reward std: 24.020
+2018-04-29 11:35:56,811 - Episode 1800
+2018-04-29 11:35:56,811 - Step 528752
+2018-04-29 11:35:57,803 - Episode reward mean: -103.970
+2018-04-29 11:35:57,803 - Episode reward std: 39.507
+2018-04-29 11:38:09,506 - Episode 1900
+2018-04-29 11:38:09,506 - Step 538210
+2018-04-29 11:38:10,934 - Episode reward mean: -93.910
+2018-04-29 11:38:10,935 - Episode reward std: 26.270
+2018-04-29 11:40:56,934 - Episode 2000
+2018-04-29 11:40:56,934 - Step 548158
+2018-04-29 11:40:58,400 - Episode reward mean: -98.290
+2018-04-29 11:40:58,401 - Episode reward std: 36.889
+2018-04-29 11:40:58,401 - **Testing mode
+2018-04-29 11:40:58,401 - Running for 20 episodes
+2018-04-29 11:41:04,406 - (test) Average reward per episode: -83.7
+2018-04-29 11:41:04,406 - Standard deviation: 10.84020295012967
+2018-04-29 11:41:04,436 - Beat previous value of -186.45! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 11:43:50,948 - Episode 2100
+2018-04-29 11:43:50,948 - Step 557712
+2018-04-29 11:43:52,315 - Episode reward mean: -94.470
+2018-04-29 11:43:52,316 - Episode reward std: 46.154
+2018-04-29 11:46:46,697 - Episode 2200
+2018-04-29 11:46:46,697 - Step 567700
+2018-04-29 11:46:48,579 - Episode reward mean: -99.170
+2018-04-29 11:46:48,579 - Episode reward std: 33.108
+2018-04-29 11:49:33,905 - Episode 2300
+2018-04-29 11:49:33,905 - Step 577198
+2018-04-29 11:49:35,402 - Episode reward mean: -93.770
+2018-04-29 11:49:35,402 - Episode reward std: 24.987
+2018-04-29 11:52:28,496 - Episode 2400
+2018-04-29 11:52:28,496 - Step 587132
+2018-04-29 11:52:30,247 - Episode reward mean: -98.510
+2018-04-29 11:52:30,247 - Episode reward std: 37.206
+2018-04-29 11:55:21,747 - Episode 2500
+2018-04-29 11:55:21,747 - Step 596937
+2018-04-29 11:55:23,176 - Episode reward mean: -96.880
+2018-04-29 11:55:23,176 - Episode reward std: 47.969
+2018-04-29 11:55:23,176 - **Testing mode
+2018-04-29 11:55:23,177 - Running for 20 episodes
+2018-04-29 11:55:30,243 - (test) Average reward per episode: -98.15
+2018-04-29 11:55:30,244 - Standard deviation: 38.63324345689862
+2018-04-29 11:58:15,076 - Episode 2600
+2018-04-29 11:58:15,077 - Step 606370
+2018-04-29 11:58:16,714 - Episode reward mean: -93.430
+2018-04-29 11:58:16,714 - Episode reward std: 50.429
+2018-04-29 12:00:53,765 - Episode 2700
+2018-04-29 12:00:53,765 - Step 615384
+2018-04-29 12:00:55,154 - Episode reward mean: -89.010
+2018-04-29 12:00:55,154 - Episode reward std: 19.228
+2018-04-29 12:03:40,101 - Episode 2800
+2018-04-29 12:03:40,101 - Step 624793
+2018-04-29 12:03:41,749 - Episode reward mean: -93.250
+2018-04-29 12:03:41,749 - Episode reward std: 24.158
+2018-04-29 12:06:19,792 - Episode 2900
+2018-04-29 12:06:19,792 - Step 633867
+2018-04-29 12:06:21,489 - Episode reward mean: -89.740
+2018-04-29 12:06:21,490 - Episode reward std: 22.478
+2018-04-29 12:09:06,641 - Episode 3000
+2018-04-29 12:09:06,641 - Step 643370
+2018-04-29 12:09:09,200 - Episode reward mean: -94.540
+2018-04-29 12:09:09,201 - Episode reward std: 43.768
+2018-04-29 12:09:09,201 - **Testing mode
+2018-04-29 12:09:09,201 - Running for 20 episodes
+2018-04-29 12:09:16,048 - (test) Average reward per episode: -96.2
+2018-04-29 12:09:16,049 - Standard deviation: 22.417850030723283
+2018-04-29 12:12:13,852 - Episode 3100
+2018-04-29 12:12:13,852 - Step 653600
+2018-04-29 12:12:15,171 - Episode reward mean: -100.610
+2018-04-29 12:12:15,171 - Episode reward std: 48.398
+2018-04-29 12:14:54,567 - Episode 3200
+2018-04-29 12:14:54,568 - Step 662670
+2018-04-29 12:14:56,365 - Episode reward mean: -89.940
+2018-04-29 12:14:56,365 - Episode reward std: 13.222
+2018-04-29 12:17:40,042 - Episode 3300
+2018-04-29 12:17:40,042 - Step 671995
+2018-04-29 12:17:41,596 - Episode reward mean: -92.130
+2018-04-29 12:17:41,596 - Episode reward std: 16.496
+2018-04-29 12:20:18,989 - Episode 3400
+2018-04-29 12:20:18,989 - Step 681097
+2018-04-29 12:20:20,437 - Episode reward mean: -89.960
+2018-04-29 12:20:20,437 - Episode reward std: 15.174
+2018-04-29 12:23:04,404 - Episode 3500
+2018-04-29 12:23:04,405 - Step 690482
+2018-04-29 12:23:06,130 - Episode reward mean: -93.000
+2018-04-29 12:23:06,131 - Episode reward std: 16.958
+2018-04-29 12:23:06,131 - **Testing mode
+2018-04-29 12:23:06,131 - Running for 20 episodes
+2018-04-29 12:23:13,107 - (test) Average reward per episode: -85.95
+2018-04-29 12:23:13,107 - Standard deviation: 15.876003905265332
+2018-04-29 12:26:27,598 - Episode 3600
+2018-04-29 12:26:27,598 - Step 699766
+2018-04-29 12:26:30,524 - Episode reward mean: -92.250
+2018-04-29 12:26:30,524 - Episode reward std: 21.377
+2018-04-29 12:29:39,816 - Episode 3700
+2018-04-29 12:29:39,816 - Step 708733
+2018-04-29 12:29:41,108 - Episode reward mean: -87.920
+2018-04-29 12:29:41,108 - Episode reward std: 18.243
+2018-04-29 12:33:06,841 - Episode 3800
+2018-04-29 12:33:06,841 - Step 718379
+2018-04-29 12:33:08,177 - Episode reward mean: -95.620
+2018-04-29 12:33:08,177 - Episode reward std: 24.910
+2018-04-29 12:36:19,361 - Episode 3900
+2018-04-29 12:36:19,362 - Step 727766
+2018-04-29 12:36:21,355 - Episode reward mean: -93.030
+2018-04-29 12:36:21,356 - Episode reward std: 29.754
+2018-04-29 12:39:24,085 - Episode 4000
+2018-04-29 12:39:24,085 - Step 736670
+2018-04-29 12:39:25,577 - Episode reward mean: -87.810
+2018-04-29 12:39:25,579 - Episode reward std: 25.836
+2018-04-29 12:39:25,579 - **Testing mode
+2018-04-29 12:39:25,579 - Running for 20 episodes
+2018-04-29 12:39:33,362 - (test) Average reward per episode: -82.4
+2018-04-29 12:39:33,363 - Standard deviation: 12.86234815265082
+2018-04-29 12:39:33,413 - Beat previous value of -83.7! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 12:42:39,771 - Episode 4100
+2018-04-29 12:42:39,771 - Step 745786
+2018-04-29 12:42:41,125 - Episode reward mean: -90.210
+2018-04-29 12:42:41,125 - Episode reward std: 28.419
+2018-04-29 12:45:17,722 - Episode 4200
+2018-04-29 12:45:17,722 - Step 754721
+2018-04-29 12:45:18,999 - Episode reward mean: -88.300
+2018-04-29 12:45:18,999 - Episode reward std: 21.470
+2018-04-29 12:47:57,747 - Episode 4300
+2018-04-29 12:47:57,748 - Step 763670
+2018-04-29 12:47:59,220 - Episode reward mean: -88.500
+2018-04-29 12:47:59,222 - Episode reward std: 17.094
+2018-04-29 12:50:47,321 - Episode 4400
+2018-04-29 12:50:47,321 - Step 772928
+2018-04-29 12:50:48,970 - Episode reward mean: -91.810
+2018-04-29 12:50:48,970 - Episode reward std: 28.900
+2018-04-29 12:53:20,209 - Episode 4500
+2018-04-29 12:53:20,210 - Step 781583
+2018-04-29 12:53:21,795 - Episode reward mean: -85.520
+2018-04-29 12:53:21,795 - Episode reward std: 14.361
+2018-04-29 12:53:21,795 - **Testing mode
+2018-04-29 12:53:21,796 - Running for 20 episodes
+2018-04-29 12:53:27,661 - (test) Average reward per episode: -83.2
+2018-04-29 12:53:27,661 - Standard deviation: 33.32356523543062
+2018-04-29 12:56:02,682 - Episode 4600
+2018-04-29 12:56:02,682 - Step 790419
+2018-04-29 12:56:04,191 - Episode reward mean: -87.310
+2018-04-29 12:56:04,191 - Episode reward std: 15.723
+2018-04-29 12:58:42,724 - Episode 4700
+2018-04-29 12:58:42,725 - Step 799449
+2018-04-29 12:58:44,362 - Episode reward mean: -89.360
+2018-04-29 12:58:44,362 - Episode reward std: 14.116
+2018-04-29 13:01:23,716 - Episode 4800
+2018-04-29 13:01:23,717 - Step 808538
+2018-04-29 13:01:25,040 - Episode reward mean: -89.720
+2018-04-29 13:01:25,040 - Episode reward std: 19.417
+2018-04-29 13:03:57,710 - Episode 4900
+2018-04-29 13:03:57,711 - Step 817246
+2018-04-29 13:03:59,037 - Episode reward mean: -86.050
+2018-04-29 13:03:59,037 - Episode reward std: 16.587
+2018-04-29 13:06:34,164 - Episode 5000
+2018-04-29 13:06:34,164 - Step 826088
+2018-04-29 13:06:35,525 - Episode reward mean: -87.440
+2018-04-29 13:06:35,526 - Episode reward std: 14.557
+2018-04-29 13:06:35,526 - **Testing mode
+2018-04-29 13:06:35,526 - Running for 20 episodes
+2018-04-29 13:06:41,346 - (test) Average reward per episode: -81.25
+2018-04-29 13:06:41,346 - Standard deviation: 16.052647756678645
+2018-04-29 13:06:41,382 - Beat previous value of -82.4! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 13:09:30,492 - Episode 5100
+2018-04-29 13:09:30,494 - Step 835324
+2018-04-29 13:09:31,793 - Episode reward mean: -91.350
+2018-04-29 13:09:31,794 - Episode reward std: 18.470
+2018-04-29 13:12:11,833 - Episode 5200
+2018-04-29 13:12:11,833 - Step 844423
+2018-04-29 13:12:13,431 - Episode reward mean: -90.170
+2018-04-29 13:12:13,431 - Episode reward std: 22.206
+2018-04-29 13:14:50,512 - Episode 5300
+2018-04-29 13:14:50,512 - Step 853373
+2018-04-29 13:14:51,786 - Episode reward mean: -88.300
+2018-04-29 13:14:51,786 - Episode reward std: 22.646
+2018-04-29 13:17:29,515 - Episode 5400
+2018-04-29 13:17:29,515 - Step 862340
+2018-04-29 13:17:30,904 - Episode reward mean: -88.750
+2018-04-29 13:17:30,904 - Episode reward std: 21.264
+2018-04-29 13:20:08,940 - Episode 5500
+2018-04-29 13:20:08,941 - Step 871370
+2018-04-29 13:20:10,409 - Episode reward mean: -89.340
+2018-04-29 13:20:10,409 - Episode reward std: 20.351
+2018-04-29 13:20:10,410 - **Testing mode
+2018-04-29 13:20:10,410 - Running for 20 episodes
+2018-04-29 13:20:16,287 - (test) Average reward per episode: -81.7
+2018-04-29 13:20:16,287 - Standard deviation: 10.188719252192595
+2018-04-29 13:22:57,468 - Episode 5600
+2018-04-29 13:22:57,468 - Step 880218
+2018-04-29 13:22:59,776 - Episode reward mean: -87.920
+2018-04-29 13:22:59,777 - Episode reward std: 21.782
+2018-04-29 13:25:43,261 - Episode 5700
+2018-04-29 13:25:43,261 - Step 889516
+2018-04-29 13:25:45,522 - Episode reward mean: -91.920
+2018-04-29 13:25:45,522 - Episode reward std: 28.818
+2018-04-29 13:28:23,798 - Episode 5800
+2018-04-29 13:28:23,798 - Step 898489
+2018-04-29 13:28:25,319 - Episode reward mean: -88.320
+2018-04-29 13:28:25,321 - Episode reward std: 20.690
+2018-04-29 13:31:02,732 - Episode 5900
+2018-04-29 13:31:02,732 - Step 907297
+2018-04-29 13:31:04,429 - Episode reward mean: -87.090
+2018-04-29 13:31:04,430 - Episode reward std: 16.912
+2018-04-29 13:33:53,273 - Episode 6000
+2018-04-29 13:33:53,273 - Step 916569
+2018-04-29 13:33:54,615 - Episode reward mean: -91.690
+2018-04-29 13:33:54,616 - Episode reward std: 21.312
+2018-04-29 13:33:54,616 - **Testing mode
+2018-04-29 13:33:54,616 - Running for 20 episodes
+2018-04-29 13:34:00,566 - (test) Average reward per episode: -84.0
+2018-04-29 13:34:00,566 - Standard deviation: 15.858751527153705
+2018-04-29 13:36:33,534 - Episode 6100
+2018-04-29 13:36:33,534 - Step 925286
+2018-04-29 13:36:35,216 - Episode reward mean: -86.350
+2018-04-29 13:36:35,216 - Episode reward std: 15.581
+2018-04-29 13:39:11,305 - Episode 6200
+2018-04-29 13:39:11,305 - Step 934159
+2018-04-29 13:39:13,801 - Episode reward mean: -88.200
+2018-04-29 13:39:13,801 - Episode reward std: 17.636
+2018-04-29 13:42:05,201 - Episode 6300
+2018-04-29 13:42:05,201 - Step 943108
+2018-04-29 13:42:06,790 - Episode reward mean: -87.820
+2018-04-29 13:42:06,791 - Episode reward std: 20.813
+2018-04-29 13:45:05,702 - Episode 6400
+2018-04-29 13:45:05,703 - Step 952658
+2018-04-29 13:45:07,014 - Episode reward mean: -94.470
+2018-04-29 13:45:07,015 - Episode reward std: 32.285
+2018-04-29 13:47:54,139 - Episode 6500
+2018-04-29 13:47:54,139 - Step 962176
+2018-04-29 13:47:55,812 - Episode reward mean: -94.390
+2018-04-29 13:47:55,813 - Episode reward std: 32.029
+2018-04-29 13:47:55,813 - **Testing mode
+2018-04-29 13:47:55,813 - Running for 20 episodes
+2018-04-29 13:48:01,487 - (test) Average reward per episode: -78.95
+2018-04-29 13:48:01,487 - Standard deviation: 10.726019765038659
+2018-04-29 13:48:01,519 - Beat previous value of -81.25! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 13:50:37,866 - Episode 6600
+2018-04-29 13:50:37,866 - Step 971103
+2018-04-29 13:50:39,608 - Episode reward mean: -88.290
+2018-04-29 13:50:39,608 - Episode reward std: 26.074
+2018-04-29 13:53:20,912 - Episode 6700
+2018-04-29 13:53:20,913 - Step 980324
+2018-04-29 13:53:22,652 - Episode reward mean: -91.210
+2018-04-29 13:53:22,652 - Episode reward std: 24.350
+2018-04-29 13:55:57,125 - Episode 6800
+2018-04-29 13:55:57,125 - Step 989158
+2018-04-29 13:56:00,777 - Episode reward mean: -88.470
+2018-04-29 13:56:00,777 - Episode reward std: 18.247
+2018-04-29 13:58:39,493 - Episode 6900
+2018-04-29 13:58:39,494 - Step 998370
+2018-04-29 13:58:40,920 - Episode reward mean: -89.820
+2018-04-29 13:58:40,920 - Episode reward std: 24.423
+2018-04-29 14:01:10,581 - Episode 7000
+2018-04-29 14:01:10,581 - Step 1006933
+2018-04-29 14:01:11,936 - Episode reward mean: -84.580
+2018-04-29 14:01:11,936 - Episode reward std: 12.982
+2018-04-29 14:01:11,936 - **Testing mode
+2018-04-29 14:01:11,936 - Running for 20 episodes
+2018-04-29 14:01:17,704 - (test) Average reward per episode: -79.4
+2018-04-29 14:01:17,705 - Standard deviation: 10.316976301223145
+2018-04-29 14:04:01,927 - Episode 7100
+2018-04-29 14:04:01,927 - Step 1015834
+2018-04-29 14:04:03,167 - Episode reward mean: -87.970
+2018-04-29 14:04:03,167 - Episode reward std: 21.975
+2018-04-29 14:06:49,884 - Episode 7200
+2018-04-29 14:06:49,884 - Step 1025262
+2018-04-29 14:06:52,110 - Episode reward mean: -93.820
+2018-04-29 14:06:52,110 - Episode reward std: 46.170
+2018-04-29 14:09:28,268 - Episode 7300
+2018-04-29 14:09:28,268 - Step 1034083
+2018-04-29 14:09:29,543 - Episode reward mean: -86.610
+2018-04-29 14:09:29,543 - Episode reward std: 19.079
+2018-04-29 14:12:02,738 - Episode 7400
+2018-04-29 14:12:02,739 - Step 1042791
+2018-04-29 14:12:04,380 - Episode reward mean: -86.370
+2018-04-29 14:12:04,380 - Episode reward std: 19.682
+2018-04-29 14:14:42,892 - Episode 7500
+2018-04-29 14:14:42,892 - Step 1051733
+2018-04-29 14:14:44,807 - Episode reward mean: -88.450
+2018-04-29 14:14:44,808 - Episode reward std: 17.933
+2018-04-29 14:14:44,808 - **Testing mode
+2018-04-29 14:14:44,808 - Running for 20 episodes
+2018-04-29 14:14:51,582 - (test) Average reward per episode: -78.35
+2018-04-29 14:14:51,582 - Standard deviation: 9.880662933224674
+2018-04-29 14:14:51,623 - Beat previous value of -78.95! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 14:17:59,975 - Episode 7600
+2018-04-29 14:17:59,976 - Step 1060800
+2018-04-29 14:18:01,331 - Episode reward mean: -89.350
+2018-04-29 14:18:01,331 - Episode reward std: 33.660
+2018-04-29 14:21:10,333 - Episode 7700
+2018-04-29 14:21:10,334 - Step 1069753
+2018-04-29 14:21:12,009 - Episode reward mean: -88.670
+2018-04-29 14:21:12,009 - Episode reward std: 24.052
+2018-04-29 14:24:12,949 - Episode 7800
+2018-04-29 14:24:12,949 - Step 1078376
+2018-04-29 14:24:14,365 - Episode reward mean: -85.160
+2018-04-29 14:24:14,365 - Episode reward std: 18.783
+2018-04-29 14:27:16,040 - Episode 7900
+2018-04-29 14:27:16,040 - Step 1086919
+2018-04-29 14:27:17,443 - Episode reward mean: -84.380
+2018-04-29 14:27:17,444 - Episode reward std: 11.983
+2018-04-29 14:30:22,303 - Episode 8000
+2018-04-29 14:30:22,304 - Step 1095585
+2018-04-29 14:30:23,898 - Episode reward mean: -85.720
+2018-04-29 14:30:23,898 - Episode reward std: 22.869
+2018-04-29 14:30:23,899 - **Testing mode
+2018-04-29 14:30:23,899 - Running for 20 episodes
+2018-04-29 14:30:31,530 - (test) Average reward per episode: -85.05
+2018-04-29 14:30:31,530 - Standard deviation: 24.1629364937294
+2018-04-29 14:33:43,443 - Episode 8100
+2018-04-29 14:33:43,444 - Step 1104612
+2018-04-29 14:33:46,361 - Episode reward mean: -89.890
+2018-04-29 14:33:46,361 - Episode reward std: 22.841
+2018-04-29 14:36:52,364 - Episode 8200
+2018-04-29 14:36:52,364 - Step 1113397
+2018-04-29 14:36:53,891 - Episode reward mean: -86.210
+2018-04-29 14:36:53,891 - Episode reward std: 16.064
+2018-04-29 14:39:57,572 - Episode 8300
+2018-04-29 14:39:57,573 - Step 1122053
+2018-04-29 14:39:58,925 - Episode reward mean: -85.570
+2018-04-29 14:39:58,926 - Episode reward std: 14.060
+2018-04-29 14:43:12,343 - Episode 8400
+2018-04-29 14:43:12,344 - Step 1131225
+2018-04-29 14:43:14,075 - Episode reward mean: -90.780
+2018-04-29 14:43:14,075 - Episode reward std: 31.286
+2018-04-29 14:46:15,972 - Episode 8500
+2018-04-29 14:46:15,973 - Step 1140055
+2018-04-29 14:46:17,592 - Episode reward mean: -87.310
+2018-04-29 14:46:17,592 - Episode reward std: 25.722
+2018-04-29 14:46:17,593 - **Testing mode
+2018-04-29 14:46:17,593 - Running for 20 episodes
+2018-04-29 14:46:26,132 - (test) Average reward per episode: -91.7
+2018-04-29 14:46:26,132 - Standard deviation: 35.16973130406316
+2018-04-29 14:49:32,318 - Episode 8600
+2018-04-29 14:49:32,319 - Step 1148916
+2018-04-29 14:49:34,654 - Episode reward mean: -87.890
+2018-04-29 14:49:34,655 - Episode reward std: 20.824
+2018-04-29 14:52:40,170 - Episode 8700
+2018-04-29 14:52:40,170 - Step 1157823
+2018-04-29 14:52:41,798 - Episode reward mean: -87.770
+2018-04-29 14:52:41,798 - Episode reward std: 25.519
+2018-04-29 14:55:39,925 - Episode 8800
+2018-04-29 14:55:39,925 - Step 1166423
+2018-04-29 14:55:41,417 - Episode reward mean: -84.990
+2018-04-29 14:55:41,418 - Episode reward std: 15.760
+2018-04-29 14:58:40,694 - Episode 8900
+2018-04-29 14:58:40,694 - Step 1175060
+2018-04-29 14:58:42,442 - Episode reward mean: -85.410
+2018-04-29 14:58:42,443 - Episode reward std: 15.761
+2018-04-29 15:01:44,316 - Episode 9000
+2018-04-29 15:01:44,316 - Step 1183797
+2018-04-29 15:01:46,399 - Episode reward mean: -86.550
+2018-04-29 15:01:46,399 - Episode reward std: 19.850
+2018-04-29 15:01:46,400 - **Testing mode
+2018-04-29 15:01:46,400 - Running for 20 episodes
+2018-04-29 15:01:54,002 - (test) Average reward per episode: -82.65
+2018-04-29 15:01:54,002 - Standard deviation: 16.316479399674428
+2018-04-29 15:05:00,479 - Episode 9100
+2018-04-29 15:05:00,482 - Step 1192778
+2018-04-29 15:05:02,468 - Episode reward mean: -88.790
+2018-04-29 15:05:02,468 - Episode reward std: 24.395
+2018-04-29 15:08:10,912 - Episode 9200
+2018-04-29 15:08:10,912 - Step 1201847
+2018-04-29 15:08:13,366 - Episode reward mean: -89.940
+2018-04-29 15:08:13,367 - Episode reward std: 26.382
+2018-04-29 15:11:21,291 - Episode 9300
+2018-04-29 15:11:21,292 - Step 1210887
+2018-04-29 15:11:22,680 - Episode reward mean: -88.840
+2018-04-29 15:11:22,680 - Episode reward std: 17.877
+2018-04-29 15:14:22,238 - Episode 9400
+2018-04-29 15:14:22,238 - Step 1219472
+2018-04-29 15:14:24,181 - Episode reward mean: -85.140
+2018-04-29 15:14:24,182 - Episode reward std: 15.321
+2018-04-29 15:17:23,804 - Episode 9500
+2018-04-29 15:17:23,804 - Step 1228098
+2018-04-29 15:17:25,295 - Episode reward mean: -85.040
+2018-04-29 15:17:25,296 - Episode reward std: 14.795
+2018-04-29 15:17:25,296 - **Testing mode
+2018-04-29 15:17:25,297 - Running for 20 episodes
+2018-04-29 15:17:32,346 - (test) Average reward per episode: -78.35
+2018-04-29 15:17:32,346 - Standard deviation: 11.799470327095197
+2018-04-29 15:20:33,894 - Episode 9600
+2018-04-29 15:20:33,895 - Step 1236872
+2018-04-29 15:20:35,656 - Episode reward mean: -86.870
+2018-04-29 15:20:35,657 - Episode reward std: 16.233
+2018-04-29 15:23:37,518 - Episode 9700
+2018-04-29 15:23:37,518 - Step 1245654
+2018-04-29 15:23:39,331 - Episode reward mean: -86.850
+2018-04-29 15:23:39,332 - Episode reward std: 15.338
+2018-04-29 15:26:41,624 - Episode 9800
+2018-04-29 15:26:41,625 - Step 1254466
+2018-04-29 15:26:43,850 - Episode reward mean: -87.290
+2018-04-29 15:26:43,850 - Episode reward std: 28.538
+2018-04-29 15:29:39,131 - Episode 9900
+2018-04-29 15:29:39,131 - Step 1262924
+2018-04-29 15:29:41,109 - Episode reward mean: -83.510
+2018-04-29 15:29:41,110 - Episode reward std: 16.034
+2018-04-29 15:32:43,772 - Episode 10000
+2018-04-29 15:32:43,772 - Step 1271719
+2018-04-29 15:32:45,356 - Episode reward mean: -86.760
+2018-04-29 15:32:45,356 - Episode reward std: 28.220
+2018-04-29 15:32:45,356 - **Testing mode
+2018-04-29 15:32:45,357 - Running for 20 episodes
+2018-04-29 15:32:52,493 - (test) Average reward per episode: -79.9
+2018-04-29 15:32:52,493 - Standard deviation: 12.852626190782956
+2018-04-29 15:35:53,930 - Episode 10100
+2018-04-29 15:35:53,931 - Step 1280483
+2018-04-29 15:35:55,508 - Episode reward mean: -86.630
+2018-04-29 15:35:55,509 - Episode reward std: 26.642
+2018-04-29 15:38:57,142 - Episode 10200
+2018-04-29 15:38:57,142 - Step 1289099
+2018-04-29 15:38:58,691 - Episode reward mean: -85.110
+2018-04-29 15:38:58,692 - Episode reward std: 16.754
+2018-04-29 15:42:03,395 - Episode 10300
+2018-04-29 15:42:03,397 - Step 1297920
+2018-04-29 15:42:05,169 - Episode reward mean: -87.340
+2018-04-29 15:42:05,169 - Episode reward std: 18.996
+2018-04-29 15:45:08,813 - Episode 10400
+2018-04-29 15:45:08,813 - Step 1306719
+2018-04-29 15:45:11,480 - Episode reward mean: -87.420
+2018-04-29 15:45:11,480 - Episode reward std: 21.981
+2018-04-29 15:48:12,136 - Episode 10500
+2018-04-29 15:48:12,136 - Step 1315400
+2018-04-29 15:48:13,534 - Episode reward mean: -85.170
+2018-04-29 15:48:13,535 - Episode reward std: 14.144
+2018-04-29 15:48:13,535 - **Testing mode
+2018-04-29 15:48:13,535 - Running for 20 episodes
+2018-04-29 15:48:21,183 - (test) Average reward per episode: -83.2
+2018-04-29 15:48:21,183 - Standard deviation: 17.937669859822932
+2018-04-29 15:51:23,896 - Episode 10600
+2018-04-29 15:51:23,896 - Step 1324071
+2018-04-29 15:51:25,740 - Episode reward mean: -85.950
+2018-04-29 15:51:25,740 - Episode reward std: 25.289
+2018-04-29 15:54:27,474 - Episode 10700
+2018-04-29 15:54:27,474 - Step 1332725
+2018-04-29 15:54:29,182 - Episode reward mean: -85.440
+2018-04-29 15:54:29,182 - Episode reward std: 16.350
+2018-04-29 15:57:34,532 - Episode 10800
+2018-04-29 15:57:34,532 - Step 1341599
+2018-04-29 15:57:36,125 - Episode reward mean: -87.750
+2018-04-29 15:57:36,125 - Episode reward std: 18.521
+2018-04-29 16:00:31,872 - Episode 10900
+2018-04-29 16:00:31,872 - Step 1350011
+2018-04-29 16:00:33,834 - Episode reward mean: -83.320
+2018-04-29 16:00:33,835 - Episode reward std: 14.524
+2018-04-29 16:03:36,373 - Episode 11000
+2018-04-29 16:03:36,374 - Step 1358747
+2018-04-29 16:03:37,764 - Episode reward mean: -86.010
+2018-04-29 16:03:37,765 - Episode reward std: 27.214
+2018-04-29 16:03:37,766 - **Testing mode
+2018-04-29 16:03:37,766 - Running for 20 episodes
+2018-04-29 16:03:45,169 - (test) Average reward per episode: -82.75
+2018-04-29 16:03:45,169 - Standard deviation: 12.020295337469875
+2018-04-29 16:06:53,675 - Episode 11100
+2018-04-29 16:06:53,675 - Step 1367713
+2018-04-29 16:06:55,167 - Episode reward mean: -88.740
+2018-04-29 16:06:55,167 - Episode reward std: 44.092
+2018-04-29 16:10:09,307 - Episode 11200
+2018-04-29 16:10:09,307 - Step 1376941
+2018-04-29 16:10:11,258 - Episode reward mean: -91.490
+2018-04-29 16:10:11,259 - Episode reward std: 43.578
+2018-04-29 16:13:08,073 - Episode 11300
+2018-04-29 16:13:08,073 - Step 1385344
+2018-04-29 16:13:09,950 - Episode reward mean: -82.990
+2018-04-29 16:13:09,950 - Episode reward std: 15.984
+2018-04-29 16:16:12,720 - Episode 11400
+2018-04-29 16:16:12,721 - Step 1394041
+2018-04-29 16:16:15,076 - Episode reward mean: -86.140
+2018-04-29 16:16:15,077 - Episode reward std: 16.210
+2018-04-29 16:19:16,701 - Episode 11500
+2018-04-29 16:19:16,701 - Step 1402734
+2018-04-29 16:19:18,301 - Episode reward mean: -85.650
+2018-04-29 16:19:18,302 - Episode reward std: 19.252
+2018-04-29 16:19:18,303 - **Testing mode
+2018-04-29 16:19:18,303 - Running for 20 episodes
+2018-04-29 16:19:25,074 - (test) Average reward per episode: -77.15
+2018-04-29 16:19:25,075 - Standard deviation: 11.118790401837783
+2018-04-29 16:19:25,119 - Beat previous value of -78.35! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 16:22:19,721 - Episode 11600
+2018-04-29 16:22:19,723 - Step 1411083
+2018-04-29 16:22:21,506 - Episode reward mean: -82.560
+2018-04-29 16:22:21,506 - Episode reward std: 14.878
+2018-04-29 16:25:23,674 - Episode 11700
+2018-04-29 16:25:23,674 - Step 1419807
+2018-04-29 16:25:25,214 - Episode reward mean: -86.120
+2018-04-29 16:25:25,214 - Episode reward std: 16.513
+2018-04-29 16:28:17,193 - Episode 11800
+2018-04-29 16:28:17,193 - Step 1428018
+2018-04-29 16:28:18,613 - Episode reward mean: -81.110
+2018-04-29 16:28:18,614 - Episode reward std: 15.654
+2018-04-29 16:31:16,334 - Episode 11900
+2018-04-29 16:31:16,335 - Step 1436553
+2018-04-29 16:31:18,152 - Episode reward mean: -84.480
+2018-04-29 16:31:18,152 - Episode reward std: 17.589
+2018-04-29 16:34:20,751 - Episode 12000
+2018-04-29 16:34:20,751 - Step 1445301
+2018-04-29 16:34:22,506 - Episode reward mean: -86.500
+2018-04-29 16:34:22,506 - Episode reward std: 17.019
+2018-04-29 16:34:22,506 - **Testing mode
+2018-04-29 16:34:22,507 - Running for 20 episodes
+2018-04-29 16:34:29,414 - (test) Average reward per episode: -77.55
+2018-04-29 16:34:29,415 - Standard deviation: 6.931630399841007
+2018-04-29 16:37:31,680 - Episode 12100
+2018-04-29 16:37:31,680 - Step 1454040
+2018-04-29 16:37:33,976 - Episode reward mean: -86.600
+2018-04-29 16:37:33,976 - Episode reward std: 17.896
+2018-04-29 16:40:33,472 - Episode 12200
+2018-04-29 16:40:33,472 - Step 1462620
+2018-04-29 16:40:35,049 - Episode reward mean: -84.450
+2018-04-29 16:40:35,050 - Episode reward std: 16.489
+2018-04-29 16:43:37,683 - Episode 12300
+2018-04-29 16:43:37,684 - Step 1471217
+2018-04-29 16:43:39,165 - Episode reward mean: -84.970
+2018-04-29 16:43:39,166 - Episode reward std: 17.720
+2018-04-29 16:46:40,336 - Episode 12400
+2018-04-29 16:46:40,337 - Step 1479809
+2018-04-29 16:46:42,023 - Episode reward mean: -85.000
+2018-04-29 16:46:42,024 - Episode reward std: 11.563
+2018-04-29 16:49:44,969 - Episode 12500
+2018-04-29 16:49:44,969 - Step 1488450
+2018-04-29 16:49:46,700 - Episode reward mean: -85.430
+2018-04-29 16:49:46,700 - Episode reward std: 17.562
+2018-04-29 16:49:46,700 - **Testing mode
+2018-04-29 16:49:46,700 - Running for 20 episodes
+2018-04-29 16:49:53,278 - (test) Average reward per episode: -74.85
+2018-04-29 16:49:53,278 - Standard deviation: 7.8311876493926516
+2018-04-29 16:49:53,330 - Beat previous value of -77.15! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 16:52:48,197 - Episode 12600
+2018-04-29 16:52:48,198 - Step 1496794
+2018-04-29 16:52:49,896 - Episode reward mean: -82.430
+2018-04-29 16:52:49,897 - Episode reward std: 13.144
+2018-04-29 16:55:44,431 - Episode 12700
+2018-04-29 16:55:44,432 - Step 1505100
+2018-04-29 16:55:45,894 - Episode reward mean: -81.950
+2018-04-29 16:55:45,895 - Episode reward std: 12.704
+2018-04-29 16:58:44,149 - Episode 12800
+2018-04-29 16:58:44,150 - Step 1513546
+2018-04-29 16:58:45,685 - Episode reward mean: -83.470
+2018-04-29 16:58:45,686 - Episode reward std: 18.338
+2018-04-29 17:01:56,654 - Episode 12900
+2018-04-29 17:01:56,655 - Step 1522597
+2018-04-29 17:01:58,438 - Episode reward mean: -89.670
+2018-04-29 17:01:58,438 - Episode reward std: 45.966
+2018-04-29 17:04:58,676 - Episode 13000
+2018-04-29 17:04:58,677 - Step 1531160
+2018-04-29 17:05:00,358 - Episode reward mean: -84.550
+2018-04-29 17:05:00,358 - Episode reward std: 15.324
+2018-04-29 17:05:00,358 - **Testing mode
+2018-04-29 17:05:00,359 - Running for 20 episodes
+2018-04-29 17:05:07,167 - (test) Average reward per episode: -76.7
+2018-04-29 17:05:07,168 - Standard deviation: 12.747941010218081
+2018-04-29 17:08:10,596 - Episode 13100
+2018-04-29 17:08:10,596 - Step 1539863
+2018-04-29 17:08:11,870 - Episode reward mean: -85.870
+2018-04-29 17:08:11,871 - Episode reward std: 25.078
+2018-04-29 17:11:19,160 - Episode 13200
+2018-04-29 17:11:19,160 - Step 1548765
+2018-04-29 17:11:21,025 - Episode reward mean: -88.260
+2018-04-29 17:11:21,026 - Episode reward std: 18.548
+2018-04-29 17:14:24,318 - Episode 13300
+2018-04-29 17:14:24,318 - Step 1557490
+2018-04-29 17:14:26,926 - Episode reward mean: -86.590
+2018-04-29 17:14:26,926 - Episode reward std: 20.365
+2018-04-29 17:17:21,272 - Episode 13400
+2018-04-29 17:17:21,272 - Step 1565872
+2018-04-29 17:17:22,817 - Episode reward mean: -82.370
+2018-04-29 17:17:22,817 - Episode reward std: 14.235
+2018-04-29 17:20:19,352 - Episode 13500
+2018-04-29 17:20:19,352 - Step 1574314
+2018-04-29 17:20:21,163 - Episode reward mean: -83.560
+2018-04-29 17:20:21,163 - Episode reward std: 14.342
+2018-04-29 17:20:21,163 - **Testing mode
+2018-04-29 17:20:21,163 - Running for 20 episodes
+2018-04-29 17:20:28,007 - (test) Average reward per episode: -77.25
+2018-04-29 17:20:28,008 - Standard deviation: 12.987975207860538
+2018-04-29 17:23:26,874 - Episode 13600
+2018-04-29 17:23:26,874 - Step 1582911
+2018-04-29 17:23:28,284 - Episode reward mean: -84.720
+2018-04-29 17:23:28,284 - Episode reward std: 22.923
+2018-04-29 17:26:40,272 - Episode 13700
+2018-04-29 17:26:40,272 - Step 1591994
+2018-04-29 17:26:41,942 - Episode reward mean: -90.010
+2018-04-29 17:26:41,942 - Episode reward std: 18.431
+2018-04-29 17:29:43,084 - Episode 13800
+2018-04-29 17:29:43,085 - Step 1600559
+2018-04-29 17:29:44,748 - Episode reward mean: -84.620
+2018-04-29 17:29:44,748 - Episode reward std: 16.781
+2018-04-29 17:32:41,715 - Episode 13900
+2018-04-29 17:32:41,716 - Step 1609163
+2018-04-29 17:32:43,121 - Episode reward mean: -84.950
+2018-04-29 17:32:43,121 - Episode reward std: 15.241
+2018-04-29 17:35:39,480 - Episode 14000
+2018-04-29 17:35:39,480 - Step 1617634
+2018-04-29 17:35:41,246 - Episode reward mean: -83.870
+2018-04-29 17:35:41,247 - Episode reward std: 19.705
+2018-04-29 17:35:41,247 - **Testing mode
+2018-04-29 17:35:41,247 - Running for 20 episodes
+2018-04-29 17:35:48,317 - (test) Average reward per episode: -77.9
+2018-04-29 17:35:48,317 - Standard deviation: 15.620179256333776
+2018-04-29 17:38:45,266 - Episode 14100
+2018-04-29 17:38:45,266 - Step 1626048
+2018-04-29 17:38:47,133 - Episode reward mean: -83.180
+2018-04-29 17:38:47,133 - Episode reward std: 15.570
+2018-04-29 17:42:04,655 - Episode 14200
+2018-04-29 17:42:04,656 - Step 1635444
+2018-04-29 17:42:06,564 - Episode reward mean: -92.960
+2018-04-29 17:42:06,565 - Episode reward std: 48.868
+2018-04-29 17:45:01,697 - Episode 14300
+2018-04-29 17:45:01,697 - Step 1643802
+2018-04-29 17:45:04,666 - Episode reward mean: -83.050
+2018-04-29 17:45:04,667 - Episode reward std: 13.912
+2018-04-29 17:48:00,677 - Episode 14400
+2018-04-29 17:48:00,677 - Step 1652259
+2018-04-29 17:48:02,857 - Episode reward mean: -83.190
+2018-04-29 17:48:02,858 - Episode reward std: 14.526
+2018-04-29 17:51:05,828 - Episode 14500
+2018-04-29 17:51:05,828 - Step 1660962
+2018-04-29 17:51:07,817 - Episode reward mean: -86.000
+2018-04-29 17:51:07,817 - Episode reward std: 22.988
+2018-04-29 17:51:07,817 - **Testing mode
+2018-04-29 17:51:07,817 - Running for 20 episodes
+2018-04-29 17:51:14,663 - (test) Average reward per episode: -77.65
+2018-04-29 17:51:14,664 - Standard deviation: 9.96130011594872
+2018-04-29 17:54:09,460 - Episode 14600
+2018-04-29 17:54:09,460 - Step 1669288
+2018-04-29 17:54:10,843 - Episode reward mean: -81.960
+2018-04-29 17:54:10,844 - Episode reward std: 27.436
+2018-04-29 17:57:10,864 - Episode 14700
+2018-04-29 17:57:10,864 - Step 1677804
+2018-04-29 17:57:12,617 - Episode reward mean: -84.330
+2018-04-29 17:57:12,617 - Episode reward std: 29.943
+2018-04-29 18:00:12,742 - Episode 14800
+2018-04-29 18:00:12,743 - Step 1686373
+2018-04-29 18:00:14,263 - Episode reward mean: -84.570
+2018-04-29 18:00:14,264 - Episode reward std: 16.046
+2018-04-29 18:03:09,325 - Episode 14900
+2018-04-29 18:03:09,325 - Step 1694735
+2018-04-29 18:03:10,848 - Episode reward mean: -82.630
+2018-04-29 18:03:10,848 - Episode reward std: 14.171
+2018-04-29 18:06:08,344 - Episode 15000
+2018-04-29 18:06:08,344 - Step 1703211
+2018-04-29 18:06:10,366 - Episode reward mean: -84.040
+2018-04-29 18:06:10,366 - Episode reward std: 14.720
+2018-04-29 18:06:10,366 - **Testing mode
+2018-04-29 18:06:10,366 - Running for 20 episodes
+2018-04-29 18:06:17,478 - (test) Average reward per episode: -77.85
+2018-04-29 18:06:17,479 - Standard deviation: 8.816320094007477
+2018-04-29 18:09:13,785 - Episode 15100
+2018-04-29 18:09:13,785 - Step 1711656
+2018-04-29 18:09:15,631 - Episode reward mean: -83.320
+2018-04-29 18:09:15,631 - Episode reward std: 15.332
+2018-04-29 18:12:21,735 - Episode 15200
+2018-04-29 18:12:21,736 - Step 1720565
+2018-04-29 18:12:23,332 - Episode reward mean: -88.000
+2018-04-29 18:12:23,333 - Episode reward std: 44.057
+2018-04-29 18:15:24,228 - Episode 15300
+2018-04-29 18:15:24,229 - Step 1729180
+2018-04-29 18:15:25,943 - Episode reward mean: -85.180
+2018-04-29 18:15:25,944 - Episode reward std: 19.313
+2018-04-29 18:18:28,859 - Episode 15400
+2018-04-29 18:18:28,860 - Step 1737970
+2018-04-29 18:18:30,654 - Episode reward mean: -86.960
+2018-04-29 18:18:30,654 - Episode reward std: 25.515
+2018-04-29 18:21:34,752 - Episode 15500
+2018-04-29 18:21:34,752 - Step 1746839
+2018-04-29 18:21:36,522 - Episode reward mean: -87.670
+2018-04-29 18:21:36,522 - Episode reward std: 21.487
+2018-04-29 18:21:36,523 - **Testing mode
+2018-04-29 18:21:36,523 - Running for 20 episodes
+2018-04-29 18:21:44,467 - (test) Average reward per episode: -87.6
+2018-04-29 18:21:44,468 - Standard deviation: 19.08507270093567
+2018-04-29 18:24:38,391 - Episode 15600
+2018-04-29 18:24:38,392 - Step 1755108
+2018-04-29 18:24:40,685 - Episode reward mean: -81.940
+2018-04-29 18:24:40,685 - Episode reward std: 13.157
+2018-04-29 18:27:40,627 - Episode 15700
+2018-04-29 18:27:40,627 - Step 1763692
+2018-04-29 18:27:42,269 - Episode reward mean: -84.530
+2018-04-29 18:27:42,269 - Episode reward std: 15.339
+2018-04-29 18:30:48,024 - Episode 15800
+2018-04-29 18:30:48,025 - Step 1772438
+2018-04-29 18:30:50,238 - Episode reward mean: -86.720
+2018-04-29 18:30:50,238 - Episode reward std: 17.085
+2018-04-29 18:33:51,302 - Episode 15900
+2018-04-29 18:33:51,303 - Step 1781078
+2018-04-29 18:33:53,045 - Episode reward mean: -85.220
+2018-04-29 18:33:53,046 - Episode reward std: 13.973
+2018-04-29 18:36:50,611 - Episode 16000
+2018-04-29 18:36:50,611 - Step 1789486
+2018-04-29 18:36:52,173 - Episode reward mean: -82.960
+2018-04-29 18:36:52,173 - Episode reward std: 16.561
+2018-04-29 18:36:52,173 - **Testing mode
+2018-04-29 18:36:52,173 - Running for 20 episodes
+2018-04-29 18:36:59,380 - (test) Average reward per episode: -81.25
+2018-04-29 18:36:59,380 - Standard deviation: 23.366375414257128
+2018-04-29 18:39:45,931 - Episode 16100
+2018-04-29 18:39:45,931 - Step 1798156
+2018-04-29 18:39:47,240 - Episode reward mean: -85.680
+2018-04-29 18:39:47,240 - Episode reward std: 17.798
+2018-04-29 18:42:33,147 - Episode 16200
+2018-04-29 18:42:33,147 - Step 1806818
+2018-04-29 18:42:35,228 - Episode reward mean: -85.820
+2018-04-29 18:42:35,228 - Episode reward std: 14.823
+2018-04-29 18:45:47,001 - Episode 16300
+2018-04-29 18:45:47,001 - Step 1815445
+2018-04-29 18:45:49,641 - Episode reward mean: -85.510
+2018-04-29 18:45:49,641 - Episode reward std: 14.022
+2018-04-29 18:49:04,594 - Episode 16400
+2018-04-29 18:49:04,595 - Step 1824298
+2018-04-29 18:49:06,892 - Episode reward mean: -87.430
+2018-04-29 18:49:06,892 - Episode reward std: 25.860
+2018-04-29 18:52:19,813 - Episode 16500
+2018-04-29 18:52:19,813 - Step 1833086
+2018-04-29 18:52:21,387 - Episode reward mean: -86.540
+2018-04-29 18:52:21,387 - Episode reward std: 20.670
+2018-04-29 18:52:21,388 - **Testing mode
+2018-04-29 18:52:21,388 - Running for 20 episodes
+2018-04-29 18:52:28,822 - (test) Average reward per episode: -78.05
+2018-04-29 18:52:28,823 - Standard deviation: 11.227087779117076
+2018-04-29 18:55:48,771 - Episode 16600
+2018-04-29 18:55:48,772 - Step 1842220
+2018-04-29 18:55:50,312 - Episode reward mean: -90.340
+2018-04-29 18:55:50,313 - Episode reward std: 44.681
+2018-04-29 18:57:49,370 - Saved model for rendering to models/acro_dqn_base/acro_dqn_base_1_of_3.h5
+2018-04-29 18:58:48,564 - Episode 16700
+2018-04-29 18:58:48,564 - Step 1850330
+2018-04-29 18:58:51,405 - Episode reward mean: -80.650
+2018-04-29 18:58:51,406 - Episode reward std: 16.686
+2018-04-29 19:02:04,340 - Episode 16800
+2018-04-29 19:02:04,341 - Step 1859107
+2018-04-29 19:02:06,749 - Episode reward mean: -86.580
+2018-04-29 19:02:06,750 - Episode reward std: 22.392
+2018-04-29 19:05:18,156 - Episode 16900
+2018-04-29 19:05:18,157 - Step 1867836
+2018-04-29 19:05:19,828 - Episode reward mean: -85.960
+2018-04-29 19:05:19,828 - Episode reward std: 23.456
+2018-04-29 19:08:28,909 - Episode 17000
+2018-04-29 19:08:28,910 - Step 1876392
+2018-04-29 19:08:30,833 - Episode reward mean: -84.710
+2018-04-29 19:08:30,833 - Episode reward std: 17.136
+2018-04-29 19:08:30,833 - **Testing mode
+2018-04-29 19:08:30,833 - Running for 20 episodes
+2018-04-29 19:08:38,685 - (test) Average reward per episode: -84.2
+2018-04-29 19:08:38,686 - Standard deviation: 19.73220717507294
+2018-04-29 19:11:47,380 - Episode 17100
+2018-04-29 19:11:47,381 - Step 1884907
+2018-04-29 19:11:49,163 - Episode reward mean: -84.040
+2018-04-29 19:11:49,164 - Episode reward std: 20.709
+2018-04-29 19:14:59,710 - Episode 17200
+2018-04-29 19:14:59,711 - Step 1893530
+2018-04-29 19:15:01,896 - Episode reward mean: -85.420
+2018-04-29 19:15:01,896 - Episode reward std: 14.797
+2018-04-29 19:18:02,679 - Episode 17300
+2018-04-29 19:18:02,679 - Step 1901781
+2018-04-29 19:18:04,492 - Episode reward mean: -81.360
+2018-04-29 19:18:04,492 - Episode reward std: 19.695
+2018-04-29 19:21:05,609 - Episode 17400
+2018-04-29 19:21:05,610 - Step 1910116
+2018-04-29 19:21:07,120 - Episode reward mean: -82.230
+2018-04-29 19:21:07,120 - Episode reward std: 13.238
+2018-04-29 19:24:15,765 - Episode 17500
+2018-04-29 19:24:15,766 - Step 1918660
+2018-04-29 19:24:17,549 - Episode reward mean: -84.550
+2018-04-29 19:24:17,549 - Episode reward std: 16.475
+2018-04-29 19:24:17,549 - **Testing mode
+2018-04-29 19:24:17,549 - Running for 20 episodes
+2018-04-29 19:24:25,281 - (test) Average reward per episode: -81.0
+2018-04-29 19:24:25,281 - Standard deviation: 15.043270920913443
+2018-04-29 19:27:29,558 - Episode 17600
+2018-04-29 19:27:29,558 - Step 1927041
+2018-04-29 19:27:31,863 - Episode reward mean: -83.050
+2018-04-29 19:27:31,863 - Episode reward std: 16.334
+2018-04-29 19:30:41,534 - Episode 17700
+2018-04-29 19:30:41,535 - Step 1935652
+2018-04-29 19:30:43,081 - Episode reward mean: -84.770
+2018-04-29 19:30:43,082 - Episode reward std: 16.506
+2018-04-29 19:34:01,152 - Episode 17800
+2018-04-29 19:34:01,153 - Step 1944685
+2018-04-29 19:34:02,765 - Episode reward mean: -89.380
+2018-04-29 19:34:02,765 - Episode reward std: 22.801
+2018-04-29 19:37:11,579 - Episode 17900
+2018-04-29 19:37:11,579 - Step 1953286
+2018-04-29 19:37:13,643 - Episode reward mean: -85.190
+2018-04-29 19:37:13,643 - Episode reward std: 15.014
+2018-04-29 19:40:18,256 - Episode 18000
+2018-04-29 19:40:18,256 - Step 1961646
+2018-04-29 19:40:21,191 - Episode reward mean: -83.010
+2018-04-29 19:40:21,192 - Episode reward std: 15.372
+2018-04-29 19:40:21,192 - **Testing mode
+2018-04-29 19:40:21,192 - Running for 20 episodes
+2018-04-29 19:40:28,572 - (test) Average reward per episode: -76.55
+2018-04-29 19:40:28,572 - Standard deviation: 9.276179170326541
+2018-04-29 19:43:34,231 - Episode 18100
+2018-04-29 19:43:34,232 - Step 1970073
+2018-04-29 19:43:36,101 - Episode reward mean: -82.770
+2018-04-29 19:43:36,101 - Episode reward std: 14.712
+2018-04-29 19:46:51,122 - Episode 18200
+2018-04-29 19:46:51,122 - Step 1978847
+2018-04-29 19:46:53,378 - Episode reward mean: -86.930
+2018-04-29 19:46:53,379 - Episode reward std: 19.740
+2018-04-29 19:50:08,302 - Episode 18300
+2018-04-29 19:50:08,302 - Step 1987643
+2018-04-29 19:50:10,501 - Episode reward mean: -86.890
+2018-04-29 19:50:10,502 - Episode reward std: 22.955
+2018-04-29 19:53:19,440 - Episode 18400
+2018-04-29 19:53:19,440 - Step 1996247
+2018-04-29 19:53:21,692 - Episode reward mean: -85.070
+2018-04-29 19:53:21,692 - Episode reward std: 13.894
+2018-04-29 19:56:31,885 - Episode 18500
+2018-04-29 19:56:31,886 - Step 2004897
+2018-04-29 19:56:33,755 - Episode reward mean: -85.380
+2018-04-29 19:56:33,755 - Episode reward std: 14.204
+2018-04-29 19:56:33,755 - **Testing mode
+2018-04-29 19:56:33,755 - Running for 20 episodes
+2018-04-29 19:56:40,963 - (test) Average reward per episode: -78.8
+2018-04-29 19:56:40,964 - Standard deviation: 13.336416310238668
+2018-04-29 19:59:48,437 - Episode 18600
+2018-04-29 19:59:48,437 - Step 2013441
+2018-04-29 19:59:49,819 - Episode reward mean: -84.210
+2018-04-29 19:59:49,820 - Episode reward std: 15.249
+2018-04-29 20:02:57,336 - Episode 18700
+2018-04-29 20:02:57,337 - Step 2021935
+2018-04-29 20:02:59,202 - Episode reward mean: -84.150
+2018-04-29 20:02:59,203 - Episode reward std: 13.380
+2018-04-29 20:06:11,945 - Episode 18800
+2018-04-29 20:06:11,945 - Step 2030652
+2018-04-29 20:06:13,940 - Episode reward mean: -86.260
+2018-04-29 20:06:13,941 - Episode reward std: 25.282
+2018-04-29 20:09:26,841 - Episode 18900
+2018-04-29 20:09:26,841 - Step 2039380
+2018-04-29 20:09:28,428 - Episode reward mean: -86.040
+2018-04-29 20:09:28,429 - Episode reward std: 19.999
+2018-04-29 20:12:40,333 - Episode 19000
+2018-04-29 20:12:40,334 - Step 2048085
+2018-04-29 20:12:42,253 - Episode reward mean: -86.210
+2018-04-29 20:12:42,254 - Episode reward std: 22.460
+2018-04-29 20:12:42,256 - **Testing mode
+2018-04-29 20:12:42,256 - Running for 20 episodes
+2018-04-29 20:12:50,021 - (test) Average reward per episode: -82.75
+2018-04-29 20:12:50,021 - Standard deviation: 29.444651466777458
+2018-04-29 20:15:57,061 - Episode 19100
+2018-04-29 20:15:57,061 - Step 2056575
+2018-04-29 20:15:59,658 - Episode reward mean: -84.200
+2018-04-29 20:15:59,658 - Episode reward std: 14.900
+2018-04-29 20:19:06,185 - Episode 19200
+2018-04-29 20:19:06,185 - Step 2065186
+2018-04-29 20:19:08,375 - Episode reward mean: -84.970
+2018-04-29 20:19:08,375 - Episode reward std: 13.795
+2018-04-29 20:22:09,591 - Episode 19300
+2018-04-29 20:22:09,591 - Step 2073511
+2018-04-29 20:22:11,524 - Episode reward mean: -82.090
+2018-04-29 20:22:11,524 - Episode reward std: 19.660
+2018-04-29 20:25:15,854 - Episode 19400
+2018-04-29 20:25:15,856 - Step 2081900
+2018-04-29 20:25:17,424 - Episode reward mean: -82.730
+2018-04-29 20:25:17,425 - Episode reward std: 14.065
+2018-04-29 20:28:20,097 - Episode 19500
+2018-04-29 20:28:20,097 - Step 2090173
+2018-04-29 20:28:21,730 - Episode reward mean: -81.750
+2018-04-29 20:28:21,731 - Episode reward std: 15.693
+2018-04-29 20:28:21,731 - **Testing mode
+2018-04-29 20:28:21,731 - Running for 20 episodes
+2018-04-29 20:28:29,243 - (test) Average reward per episode: -78.1
+2018-04-29 20:28:29,243 - Standard deviation: 11.040380428228007
+2018-04-29 20:31:32,169 - Episode 19600
+2018-04-29 20:31:32,169 - Step 2098454
+2018-04-29 20:31:34,150 - Episode reward mean: -81.950
+2018-04-29 20:31:34,151 - Episode reward std: 13.812
+2018-04-29 20:34:45,489 - Episode 19700
+2018-04-29 20:34:45,490 - Step 2107179
+2018-04-29 20:34:47,440 - Episode reward mean: -86.280
+2018-04-29 20:34:47,441 - Episode reward std: 22.909
+2018-04-29 20:37:36,403 - Episode 19800
+2018-04-29 20:37:36,404 - Step 2115274
+2018-04-29 20:37:38,088 - Episode reward mean: -79.840
+2018-04-29 20:37:38,088 - Episode reward std: 16.060
+2018-04-29 20:40:42,467 - Episode 19900
+2018-04-29 20:40:42,468 - Step 2123646
+2018-04-29 20:40:44,580 - Episode reward mean: -82.910
+2018-04-29 20:40:44,580 - Episode reward std: 13.767
+2018-04-29 20:43:48,146 - Episode 20000
+2018-04-29 20:43:48,146 - Step 2131953
+2018-04-29 20:43:49,945 - Episode reward mean: -81.880
+2018-04-29 20:43:49,945 - Episode reward std: 12.204
+2018-04-29 20:43:49,945 - **Testing mode
+2018-04-29 20:43:49,946 - Running for 20 episodes
+2018-04-29 20:43:56,764 - (test) Average reward per episode: -73.3
+2018-04-29 20:43:56,764 - Standard deviation: 9.257969539807311
+2018-04-29 20:43:56,804 - Beat previous value of -74.85! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 20:47:02,876 - Episode 20100
+2018-04-29 20:47:02,876 - Step 2140378
+2018-04-29 20:47:04,651 - Episode reward mean: -83.260
+2018-04-29 20:47:04,654 - Episode reward std: 27.171
+2018-04-29 20:50:05,183 - Episode 20200
+2018-04-29 20:50:05,184 - Step 2148560
+2018-04-29 20:50:06,962 - Episode reward mean: -80.890
+2018-04-29 20:50:06,963 - Episode reward std: 13.474
+2018-04-29 20:53:05,895 - Episode 20300
+2018-04-29 20:53:05,895 - Step 2156703
+2018-04-29 20:53:07,513 - Episode reward mean: -80.320
+2018-04-29 20:53:07,514 - Episode reward std: 12.535
+2018-04-29 20:56:09,973 - Episode 20400
+2018-04-29 20:56:09,973 - Step 2165029
+2018-04-29 20:56:11,785 - Episode reward mean: -82.310
+2018-04-29 20:56:11,785 - Episode reward std: 17.889
+2018-04-29 20:59:10,790 - Episode 20500
+2018-04-29 20:59:10,790 - Step 2173120
+2018-04-29 20:59:12,824 - Episode reward mean: -80.010
+2018-04-29 20:59:12,825 - Episode reward std: 13.087
+2018-04-29 20:59:12,825 - **Testing mode
+2018-04-29 20:59:12,825 - Running for 20 episodes
+2018-04-29 20:59:19,978 - (test) Average reward per episode: -74.2
+2018-04-29 20:59:19,978 - Standard deviation: 12.456323695216017
+2018-04-29 21:02:24,574 - Episode 20600
+2018-04-29 21:02:24,575 - Step 2181499
+2018-04-29 21:02:26,659 - Episode reward mean: -82.830
+2018-04-29 21:02:26,659 - Episode reward std: 15.445
+2018-04-29 21:05:32,197 - Episode 20700
+2018-04-29 21:05:32,197 - Step 2189976
+2018-04-29 21:05:34,189 - Episode reward mean: -83.740
+2018-04-29 21:05:34,190 - Episode reward std: 26.522
+2018-04-29 21:08:27,025 - Episode 20800
+2018-04-29 21:08:27,026 - Step 2197925
+2018-04-29 21:08:28,582 - Episode reward mean: -78.290
+2018-04-29 21:08:28,582 - Episode reward std: 12.283
+2018-04-29 21:11:40,225 - Episode 20900
+2018-04-29 21:11:40,225 - Step 2206646
+2018-04-29 21:11:41,770 - Episode reward mean: -86.200
+2018-04-29 21:11:41,770 - Episode reward std: 19.191
+2018-04-29 21:14:36,505 - Episode 21000
+2018-04-29 21:14:36,506 - Step 2214565
+2018-04-29 21:14:38,044 - Episode reward mean: -78.210
+2018-04-29 21:14:38,045 - Episode reward std: 13.409
+2018-04-29 21:14:38,046 - **Testing mode
+2018-04-29 21:14:38,046 - Running for 20 episodes
+2018-04-29 21:14:45,821 - (test) Average reward per episode: -81.05
+2018-04-29 21:14:45,821 - Standard deviation: 14.055159195114085
+2018-04-29 21:17:42,101 - Episode 21100
+2018-04-29 21:17:42,101 - Step 2222531
+2018-04-29 21:17:44,261 - Episode reward mean: -78.880
+2018-04-29 21:17:44,262 - Episode reward std: 18.978
+2018-04-29 21:20:51,448 - Episode 21200
+2018-04-29 21:20:51,449 - Step 2231034
+2018-04-29 21:20:53,291 - Episode reward mean: -83.890
+2018-04-29 21:20:53,291 - Episode reward std: 19.832
+2018-04-29 21:23:56,198 - Episode 21300
+2018-04-29 21:23:56,199 - Step 2239282
+2018-04-29 21:23:58,480 - Episode reward mean: -81.710
+2018-04-29 21:23:58,480 - Episode reward std: 14.372
+2018-04-29 21:26:57,099 - Episode 21400
+2018-04-29 21:26:57,099 - Step 2247414
+2018-04-29 21:26:58,790 - Episode reward mean: -80.020
+2018-04-29 21:26:58,791 - Episode reward std: 11.205
+2018-04-29 21:30:09,128 - Episode 21500
+2018-04-29 21:30:09,128 - Step 2256055
+2018-04-29 21:30:11,216 - Episode reward mean: -85.620
+2018-04-29 21:30:11,216 - Episode reward std: 26.968
+2018-04-29 21:30:11,217 - **Testing mode
+2018-04-29 21:30:11,217 - Running for 20 episodes
+2018-04-29 21:30:18,466 - (test) Average reward per episode: -74.05
+2018-04-29 21:30:18,467 - Standard deviation: 8.339514374350584
+2018-04-29 21:33:15,000 - Episode 21600
+2018-04-29 21:33:15,000 - Step 2264052
+2018-04-29 21:33:17,039 - Episode reward mean: -78.920
+2018-04-29 21:33:17,039 - Episode reward std: 13.218
+2018-04-29 21:36:21,401 - Episode 21700
+2018-04-29 21:36:21,401 - Step 2272405
+2018-04-29 21:36:23,511 - Episode reward mean: -82.610
+2018-04-29 21:36:23,511 - Episode reward std: 15.431
+2018-04-29 21:39:24,598 - Episode 21800
+2018-04-29 21:39:24,599 - Step 2280610
+2018-04-29 21:39:26,374 - Episode reward mean: -80.870
+2018-04-29 21:39:26,375 - Episode reward std: 13.187
+2018-04-29 21:42:28,972 - Episode 21900
+2018-04-29 21:42:28,972 - Step 2288851
+2018-04-29 21:42:30,626 - Episode reward mean: -81.340
+2018-04-29 21:42:30,626 - Episode reward std: 16.158
+2018-04-29 21:45:36,319 - Episode 22000
+2018-04-29 21:45:36,319 - Step 2297224
+2018-04-29 21:45:37,935 - Episode reward mean: -82.740
+2018-04-29 21:45:37,936 - Episode reward std: 16.595
+2018-04-29 21:45:37,936 - **Testing mode
+2018-04-29 21:45:37,936 - Running for 20 episodes
+2018-04-29 21:45:45,172 - (test) Average reward per episode: -75.9
+2018-04-29 21:45:45,172 - Standard deviation: 11.11710393942595
+2018-04-29 21:48:48,359 - Episode 22100
+2018-04-29 21:48:48,359 - Step 2305469
+2018-04-29 21:48:50,440 - Episode reward mean: -81.640
+2018-04-29 21:48:50,440 - Episode reward std: 14.482
+2018-04-29 21:51:54,999 - Episode 22200
+2018-04-29 21:51:54,999 - Step 2313790
+2018-04-29 21:51:56,561 - Episode reward mean: -82.000
+2018-04-29 21:51:56,561 - Episode reward std: 15.986
+2018-04-29 21:54:57,362 - Episode 22300
+2018-04-29 21:54:57,362 - Step 2321966
+2018-04-29 21:54:59,544 - Episode reward mean: -81.040
+2018-04-29 21:54:59,544 - Episode reward std: 13.897
+2018-04-29 21:57:58,231 - Episode 22400
+2018-04-29 21:57:58,232 - Step 2330084
+2018-04-29 21:58:00,159 - Episode reward mean: -80.080
+2018-04-29 21:58:00,160 - Episode reward std: 15.392
+2018-04-29 22:01:14,379 - Episode 22500
+2018-04-29 22:01:14,380 - Step 2338813
+2018-04-29 22:01:16,336 - Episode reward mean: -86.300
+2018-04-29 22:01:16,336 - Episode reward std: 31.094
+2018-04-29 22:01:16,337 - **Testing mode
+2018-04-29 22:01:16,337 - Running for 20 episodes
+2018-04-29 22:01:23,173 - (test) Average reward per episode: -71.95
+2018-04-29 22:01:23,174 - Standard deviation: 9.733832749744572
+2018-04-29 22:01:23,224 - Beat previous value of -73.3! Saved model to models/acro_dqn_base/acro_dqn_base.h5
+2018-04-29 22:04:23,966 - Episode 22600
+2018-04-29 22:04:23,966 - Step 2346971
+2018-04-29 22:04:25,322 - Episode reward mean: -80.310
+2018-04-29 22:04:25,322 - Episode reward std: 17.016
+2018-04-29 22:07:29,908 - Episode 22700
+2018-04-29 22:07:29,909 - Step 2355354
+2018-04-29 22:07:32,098 - Episode reward mean: -83.170
+2018-04-29 22:07:32,098 - Episode reward std: 13.230
