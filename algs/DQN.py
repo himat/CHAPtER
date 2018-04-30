@@ -266,7 +266,7 @@ class DQN_Agent():
         # in this function, while also updating your network parameters. 
         # If you are using a replay memory, you should interact with environment here, and store these 
         # transitions to memory, while also updating your model.
-
+        assert(rep_batch_size > 0) 
         if self.hindsight_replay:
             assert(default_goal is not None)
 
@@ -338,7 +338,9 @@ class DQN_Agent():
 
                     experience = self.take_step(curr_state, batch_size, default_goal)
                     _, reward, action_i, curr_state, is_terminal = experience
-                    exp_batch.append((experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal))
+                    new_exp = (experience[0].copy(), reward, action_i, curr_state.copy(), is_terminal)
+                    exp_batch.append(new_exp)
+                    rep_mem.append(new_exp)
                     
                     if is_terminal:
                         break
@@ -362,7 +364,7 @@ class DQN_Agent():
                     assert(len(exp_batch) == 1)
                 
                     # TODO: incorporate weights into loss function calculation
-                    train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, new_exp=exp_batch[0], beta=priority_replay_beta)
+                    train_batch, batch_weights, batch_indexes = rep_mem.sample_batch(rep_batch_size, beta=priority_replay_beta)
 
                     train_size = rep_batch_size
 
@@ -381,7 +383,7 @@ class DQN_Agent():
                     break
 
             if self.hindsight_replay:
-                rep_mem.append_episode(episode_exps)
+                rep_mem.append_HER_episode(episode_exps)
 
 
             #logging/saving/recording section

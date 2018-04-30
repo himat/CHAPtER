@@ -49,9 +49,10 @@ class Replay_Memory():
         self.default_goal = default_goal
         self.goal_dim = default_goal.shape[1] if default_goal is not None else None # How many dimensions the goal is defined over
 
-    # Returns a batch_size set of experiences, and also (optionally) adds a new experience to the buffer
-    # If using combined replay, you have to pass in the new_exp
-    def sample_batch(self, batch_size, new_exp=None, beta=None):
+    # Returns a batch_size set of experiences
+    # WARNING: Replay_Memory.append() must be called prior to sample_batch when this is called in the training loop
+    #   This is especially important when using combined replay
+    def sample_batch(self, batch_size, beta=None):
         assert(batch_size > 0)
 
         ret_batch = None
@@ -60,13 +61,9 @@ class Replay_Memory():
 
         if self.combined:
             batch_size -= 1 
-        else:
-            if new_exp is not None: 
-                latest_exp_index = self.append(new_exp) # Add to buffer 
 
         if self.prioritized:
             ret_batch, sample_weights, sample_indexes = self._priority_sample_batch(batch_size, beta)
-
         else: 
             # Uniform sampling 
             ret_batch = random.sample(self.experiences, batch_size)
@@ -75,9 +72,12 @@ class Replay_Memory():
         if self.combined:
             assert(new_exp is not None) # Need to have passed in the newest sample
 
-            # Adding after so that there's no chance of double sampling this experience 
-            latest_exp_index = self.append(new_exp) # Add to buffer 
-            ret_batch.append(new_exp) 
+            # Maybe todo: fix so that you can't double sample the most recent experience
+
+            # Assumes that the most recent experience was just added via the .append() call of this class
+            latest_exp_index = (self.next_index - 1) % self.max_mem_size
+            latest_exp = self.experiences[latest_exp_index]
+            ret_batch.append(latest_exp) 
 
             if self.prioritized:
                 sample_weights.append(1.0) # weight of 1 sounds good
@@ -86,7 +86,8 @@ class Replay_Memory():
         return (encode_samples(ret_batch), sample_weights, sample_indexes)
       
     # Adding HER goal updates
-    def append_episode(self, episode, reward_mod=None):
+    # Call this function and pass in the entire episode after episode is over
+    def append_HER_episode(self, episode, reward_mod=None):
         
         if self.hindsight:
             _, _, _, end_state, is_terminal = episode[-1]
@@ -104,6 +105,8 @@ class Replay_Memory():
                 next_state = next_state.copy()
                 next_state[0, -self.goal_dim:] = end_state[0, 0:self.goal_dim]
                 self.append((curr_state, reward, action, next_state, is_terminal))
+
+
 
     # Appends transition to the memory.     
     def append(self, transition):

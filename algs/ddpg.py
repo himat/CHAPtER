@@ -256,7 +256,7 @@ class DDPG():
         state_dim = env.observation_space.shape[0]
         action_bound = env.action_space.high
         # Ensure action bound is symmetric
-        assert (env.action_space.high == -env.action_space.low)
+        assert (env.action_space.high == -env.action_space.low).all()
         if default_goal != None:
             state_dim += default_goal.shape[1]
 
@@ -275,6 +275,7 @@ class DDPG():
 # ===========================
 
     def burn_in(self, env, buf, exp_limit=10000, default_goal=None):
+        logger.info(f"Burning in {exp_limit} experiences")
 
         steps = 0
         while steps < exp_limit:
@@ -284,18 +285,23 @@ class DDPG():
             if default_goal != None:
                 s = np.concatenate([s, default_goal], axis=1)
             current_episode = []
-            while not terminal:
-                
+            while not terminal:                
                 a = self.actor.predict(s) + self.actor_noise()
 
                 s2, r, terminal, info = env.step(a[0])
+                s2 = s2.reshape((1,-1))
+
                 if default_goal != None:
-                    s2 = np.concatenate([s2.reshape((1, -1)), default_goal], axis=1)
+                    s2 = np.concatenate([s2, default_goal], axis=1)
             
-                current_episode.append((s, r, a, np.reshape(s2, (1, -1)), terminal))
+                exp = (s, r, a, s2, terminal)
+                current_episode.append(exp)
+                buf.append(exp) # Add exps with original goals
                 s = s2
             steps += len(current_episode)
-            buf.append_episode(current_episode)
+
+            if buf.hindsight:
+                buf.append_HER_episode(current_episode) # Add exps with HER goals
 
     def train(self, env, num_eps=10000, combined_replay=False, hindsight_replay=False, 
         priority_replay=False, render=False, default_goal=None, batch_size=64, train_mod=1,
@@ -359,10 +365,9 @@ class DDPG():
                     print(f"Big reward of {r}")
                 current_reward += r
 
-                current_episode.append((s, r, a, s2, terminal))
-
-                # Keep adding experience to the memory until
-                # there are at least minibatch size samples
+                exp = (s, r, a, s2, terminal)
+                current_episode.append(exp)
+                replay_buffer.append(exp)
                
                 samples, sample_weights, sample_indexes = replay_buffer.sample_batch(batch_size)
 
@@ -396,8 +401,10 @@ class DDPG():
 
                 s = s2
 
-            replay_buffer.append_episode(current_episode, 
-                reward_mod=lambda x: 100 if x[4] else x[1])
+            if replay_buffer.hindsight:
+                replay_buffer.append_HER_episode(current_episode, 
+                    reward_mod=lambda x: 100 if x[4] else x[1])
+
             train_reward.append(current_reward)
 
             if eps_idx % train_mod == 0 and eps_idx != 0:
