@@ -6,3 +6,4 @@ keras
 matplotlib
 pyglet
 h5py
+tflearn

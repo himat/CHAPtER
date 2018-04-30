@@ -324,6 +324,8 @@ class DDPG():
         # tflearn.is_training(True)
 
         train_reward = []
+        best_test_reward = None
+        best_test_epoch = None
        
         for eps_idx in range(num_eps):
 
@@ -332,13 +334,14 @@ class DDPG():
             if default_goal != None:
                 s = np.concatenate([s, default_goal], axis=1)
 
-
-            
             terminal = False
 
             current_episode = []
             current_reward = 0
-            print(f"eps_idx: {eps_idx}")
+
+            if eps_idx % train_mod == 0 or eps_idx % test_mod == 0:
+                logger.info(f"Episode {eps_idx}")
+
             while not terminal:
 
                 if render:
@@ -403,9 +406,21 @@ class DDPG():
                 train_reward = []
 
             if eps_idx % test_mod == 0 and eps_idx != 0:
-                test_reward = self.test(env, num_eps=100, default_goal=default_goal)
-                logger.info("Test reward mean: {:.3f}".format(statistics.mean(test_reward)))
-                logger.info("Test reward std: {:.3f}".format(statistics.stdev(test_reward)))
+                test_reward_list = self.test(env, num_eps=100, default_goal=default_goal)
+                test_reward_avg = statistics.mean(test_reward_list)
+                test_reward_stdev = statistics.stdev(test_reward_list)
+                logger.info("Test reward mean: {:.3f}".format(test_reward_avg))
+                logger.info("Test reward std: {:.3f}".format(test_reward_stdev))
+
+                if best_test_reward == None or test_reward_avg > best_test_reward:
+                    logger.info(f"New best reward of {test_reward_avg}")
+                    logger.info(f"Beat old reward of {best_test_reward}")
+                    best_test_reward = test_reward_avg
+                    best_test_epoch = eps_idx
+
+                    # TODO: save model here
+
+        logger.info(f"Best test reward: {best_test_reward} at epoch {best_test_epoch}")
                 
 
     def test(self, env, num_eps=100, default_goal=None):

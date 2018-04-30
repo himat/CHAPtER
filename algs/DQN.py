@@ -180,6 +180,8 @@ class DQN_Agent():
         self.model_name = model_name
         self.render = render 
 
+        self.net.model.summary(print_fn=lambda x: logger.info(x))
+
         self.combined_replay = combined_replay
         self.priority_replay = priority_replay
         self.hindsight_replay = hindsight_replay
