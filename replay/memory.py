@@ -86,7 +86,7 @@ class Replay_Memory():
         return (encode_samples(ret_batch), sample_weights, sample_indexes)
       
     # Adding HER goal updates
-    def append_episode(self, episode):
+    def append_episode(self, episode, reward_mod=None):
         
         if self.hindsight:
             _, _, _, end_state, is_terminal = episode[-1]
@@ -96,6 +96,7 @@ class Replay_Memory():
                 (curr_state, reward, action, next_state, is_terminal) = experience
 
                 is_terminal = np.allclose(next_state[0, 0:self.goal_dim], end_state[0, 0:self.goal_dim], rtol=1e-6)
+                reward = reward_mod(experience) if reward_mod else reward
                 # if is_terminal:
                 #     print(f"Big terminal boys")
                 curr_state = curr_state.copy()

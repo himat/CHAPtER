@@ -3,6 +3,7 @@ import keras, tensorflow as tf, numpy as np, gym, sys, copy, argparse
 import random
 from algs.DQN import create_dqn
 from algs.a2c import A2C
+from algs.ddpg import DDPG
 import time 
 import logging 
 import os.path
@@ -108,7 +109,7 @@ def main(args):
     keras.backend.tensorflow_backend.set_session(sess)
 
     #assert(args.env in ["CartPole-v0", "MountainCar-v0", "LunarLander-v2"])
-    assert(args.alg in ["a2c", "dqn"])
+    assert(args.alg in ["a2c", "dqn", "ddpg"])
 
     logger.info(f"Command line args: {args}")
     logger.info(f"Log saving to {log_file_name}")
@@ -116,7 +117,7 @@ def main(args):
     
 
     if args.hindsight:
-        if args.env_name == "MountainCar-v0":
+        if args.env_name == "MountainCar-v0" or args.env_name == "MountainCarContinuous-v0":
             default_goal = np.array([[0.5]]) # flag at x = 0.5
         elif args.env_name == "LunarLander-v2":
             default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
@@ -124,7 +125,7 @@ def main(args):
             raise ValueError("Hindsight not enabled for this env")
 
     else:
-        default_goal = None 
+        default_goal = None
 
     if args.seed != None:
         time_seed = args.seed
@@ -137,7 +138,12 @@ def main(args):
 
     env = gym.make(args.env_name)
     num_inputs = env.observation_space.shape[0]
-    num_outputs = env.action_space.n
+    
+    num_outputs = None
+    try:
+        num_outputs = env.action_space.n
+    except AttributeError:
+        pass
     print(f"Num env inputs (state space): {num_inputs}")
     print(f"Num env outputs (actions): {num_outputs}")
 
@@ -145,6 +151,8 @@ def main(args):
         agent = A2C(env, args.model_name, args.actor_model_path, args.actor_lr, args.critic_model_path, args.critic_lr, N=args.N, logger=logger)
     elif args.alg == "dqn":
         agent, use_episodes, num_train_episodes, num_train_steps = create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
+    elif args.alg == "ddpg":
+        agent = DDPG(env, args.critic_lr, args.actor_lr, args.gamma, batch_size=args.replay_batch, default_goal=default_goal)
 
     if args.record_video_only:
         agent.test(record_video=True)
@@ -164,6 +172,9 @@ def main(args):
             rep_batch_size = False if args.replay_batch == 0 else args.replay_batch, 
             print_episode_mod=args.train_mod, test_episode_mod=args.test_mod,
             replay_mem_size=args.memory_size, default_goal=default_goal)
+        elif args.alg == "ddpg":
+            agent.train(env, args.num_episodes, default_goal=default_goal, hindsight_replay=args.hindsight,
+                train_mod=args.train_mod, test_mod=args.test_mod)
         
 
     logger.info(f"Log saved to {log_file_name}")
