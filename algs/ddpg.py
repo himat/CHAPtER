@@ -418,7 +418,7 @@ class DDPG():
                 test_reward_list = self.test(env, num_eps=100, default_goal=default_goal)
                 test_reward_avg = statistics.mean(test_reward_list)
                 test_reward_stdev = statistics.stdev(test_reward_list)
-                logger.info("Test reward mean: {:.3f}".format(test_reward_avg))
+                logger.info("(test) Test reward mean: {:.3f}".format(test_reward_avg))
                 logger.info("Test reward std: {:.3f}".format(test_reward_stdev))
 
                 if best_test_reward == None or test_reward_avg > best_test_reward:
@@ -433,6 +433,7 @@ class DDPG():
                 
 
     def test(self, env, num_eps=100, default_goal=None):
+        logger.info("**Testing mode")
         rewards = []
         for i in range(num_eps):
             terminal = False
@@ -442,7 +443,7 @@ class DDPG():
             while not terminal:
                 if default_goal is not None:
                     s = np.concatenate([s, default_goal], axis=1) 
-                    
+
                 a = self.actor.predict(s) + self.actor_noise()
                 a = np.clip(a, env.action_space.low, env.action_space.high) # Make sure outputs are valid
 
