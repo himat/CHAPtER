@@ -257,7 +257,7 @@ class DDPG():
         action_bound = env.action_space.high
         # Ensure action bound is symmetric
         assert (env.action_space.high == -env.action_space.low).all()
-        if default_goal != None:
+        if default_goal is not None:
             state_dim += default_goal.shape[1]
 
         self.actor = ActorNetwork(self.sess, state_dim, action_dim, action_bound,
@@ -282,7 +282,7 @@ class DDPG():
             terminal = False
 
             s = env.reset().reshape((1, -1))
-            if default_goal != None:
+            if default_goal is not None:
                 s = np.concatenate([s, default_goal], axis=1)
             current_episode = []
             while not terminal:                
@@ -292,7 +292,7 @@ class DDPG():
                 s2, r, terminal, info = env.step(a[0])
                 s2 = s2.reshape((1,-1))
 
-                if default_goal != None:
+                if default_goal is not None:
                     s2 = np.concatenate([s2, default_goal], axis=1)
             
                 exp = (s, r, a, s2, terminal)
@@ -338,7 +338,7 @@ class DDPG():
 
             s = env.reset().reshape((1, -1))
             
-            if default_goal != None:
+            if default_goal is not None:
                 s = np.concatenate([s, default_goal], axis=1)
 
             terminal = False
@@ -360,7 +360,7 @@ class DDPG():
 
                 s2, r, terminal, info = env.step(a[0])
                 s2 = s2.reshape((1, -1))
-                if default_goal != None:
+                if default_goal is not None:
                     s2 = np.concatenate([s2, default_goal], axis=1)
                 # print(f"Reward {r}")
                 # if r > 50.0:
@@ -440,10 +440,12 @@ class DDPG():
             s = env.reset().reshape((1, -1))
             reward = 0
             while not terminal:
-                s = np.concatenate([s, default_goal], axis=1) if default_goal else s
+                if default_goal is not None:
+                    s = np.concatenate([s, default_goal], axis=1) 
+                    
                 a = self.actor.predict(s) + self.actor_noise()
                 a = np.clip(a, env.action_space.low, env.action_space.high) # Make sure outputs are valid
-                
+
                 s2, r, terminal, info = env.step(a[0])
                 reward += r
                 s = s2.reshape((1, -1))

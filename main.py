@@ -119,7 +119,7 @@ def main(args):
     if args.hindsight:
         if args.env_name == "MountainCar-v0" or args.env_name == "MountainCarContinuous-v0":
             default_goal = np.array([[0.5]]) # flag at x = 0.5
-        elif args.env_name == "LunarLander-v2":
+        elif args.env_name == "LunarLander-v2" or args.env_name == "LunarLanderContinuous-v2":
             default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
         else:
             raise ValueError("Hindsight not enabled for this env")
