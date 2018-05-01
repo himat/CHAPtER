@@ -287,7 +287,8 @@ class DDPG():
             current_episode = []
             while not terminal:                
                 a = self.actor.predict(s) + self.actor_noise()
-
+                a = np.clip(a, env.action_space.low, env.action_space.high) # Make sure outputs are valid
+                
                 s2, r, terminal, info = env.step(a[0])
                 s2 = s2.reshape((1,-1))
 
@@ -355,14 +356,15 @@ class DDPG():
                 # Added exploration noise
                 #a = actor.predict(np.reshape(s, (1, 3))) + (1. / (1. + i))
                 a = self.actor.predict(s) + self.actor_noise()
+                a = np.clip(a, env.action_space.low, env.action_space.high) # Make sure outputs are valid
 
                 s2, r, terminal, info = env.step(a[0])
                 s2 = s2.reshape((1, -1))
                 if default_goal != None:
                     s2 = np.concatenate([s2, default_goal], axis=1)
                 # print(f"Reward {r}")
-                if r > 50.0:
-                    print(f"Big reward of {r}")
+                # if r > 50.0:
+                #     print(f"Big reward of {r}")
                 current_reward += r
 
                 exp = (s, r, a, s2, terminal)
@@ -440,6 +442,8 @@ class DDPG():
             while not terminal:
                 s = np.concatenate([s, default_goal], axis=1) if default_goal else s
                 a = self.actor.predict(s) + self.actor_noise()
+                a = np.clip(a, env.action_space.low, env.action_space.high) # Make sure outputs are valid
+                
                 s2, r, terminal, info = env.step(a[0])
                 reward += r
                 s = s2.reshape((1, -1))
