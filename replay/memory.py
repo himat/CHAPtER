@@ -70,7 +70,6 @@ class Replay_Memory():
 
         # Add latest experience to return sample
         if self.combined:
-            assert(new_exp is not None) # Need to have passed in the newest sample
 
             # Maybe todo: fix so that you can't double sample the most recent experience
 
