@@ -559,8 +559,8 @@ def create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed):
     agent = DQN_Agent(curr_model_dir, logger, env, gamma, eps_init=args.epsilon, lr_init=args.lr, 
             render=args.render, test_mode=args.test_only, model_name=args.model_name, 
             deep=args.deepness, seed=time_seed, alt_learn=args.alt_learn, 
-            goal_size=default_goal.shape[1] if args.hindsight else 0,
+            goal_size=default_goal.shape[1] if args.hindsight_replay else 0,
             combined_replay=args.combined_replay, priority_replay=args.priority_replay,
-            hindsight_replay=args.hindsight)
+            hindsight_replay=args.hindsight_replay)
 
     return agent, use_episodes, num_train_episodes, num_train_steps 

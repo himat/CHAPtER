@@ -124,6 +124,7 @@ def main(args):
         elif args.env_name == "Pendulum-v0":
             default_goal = np.array([1.0, 0.0, 0.0]) # cos(theta), sin(theta), theta dot 
                                                     # theta is normalized between pi and -pi
+            logger.info(default_goal.shape)
         else:
             raise ValueError("Hindsight not enabled for this env")
 
