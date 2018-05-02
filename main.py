@@ -60,7 +60,7 @@ def parse_arguments():
     
     # ER
     parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=32)
-    parser.add_argument('--hindsight', action="store_true")
+    parser.add_argument('--hindsight-replay', action="store_true")
     parser.add_argument('--combined-replay', dest='combined_replay', action="store_true")
     parser.add_argument('--priority-replay', dest='priority_replay', action="store_true")
     # TODO: add diffeq ultimate replay evolution adaptation 
@@ -121,6 +121,9 @@ def main(args):
             default_goal = np.array([[0.5]]) # flag at x = 0.5
         elif args.env_name == "LunarLander-v2" or args.env_name == "LunarLanderContinuous-v2":
             default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
+        elif args.env_name == "Pendulum-v0":
+            default_goal = np.array([1.0, 0.0, 0.0]) # cos(theta), sin(theta), theta dot 
+                                                    # theta is normalized between pi and -pi
         else:
             raise ValueError("Hindsight not enabled for this env")
 
