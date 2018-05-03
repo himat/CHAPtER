@@ -1,0 +1,69 @@
+2018-05-01 17:34:53,151 - Command line args: Namespace(N=50, actor_lr=0.0001, actor_model_path=None, alg='ddpg', alt_learn=False, combined_replay=False, critic_lr=0.0001, critic_model_path=None, deepness=False, env_name='Pendulum-v0', epsilon=0.5, gamma=0.99, hindsight=False, lr=0.0001, memory_size=50000, model_name='pendulum_ddpg_w_mem_baseline', num_episodes=50000, priority_replay=False, record_video_only=False, render=False, replay_batch=64, seed=None, test_mod=500, test_only=False, train_mod=100)
+2018-05-01 17:34:53,152 - Log saving to logs/pendulum_ddpg_w_mem_baseline_2018_05_01_17_34_53.log
+2018-05-01 17:34:53,152 - Alg: ddpg
+2018-05-01 17:34:53,152 - Numpy random seed 2744816845
+2018-05-01 17:34:58,558 - Burning in 10000 experiences
+2018-05-01 17:35:40,484 - Episode 0
+2018-05-01 18:06:59,389 - Episode 100
+2018-05-01 18:07:18,241 - Episode reward mean: -1485.853
+2018-05-01 18:07:18,242 - Episode reward std: 99.428
+2018-05-01 18:35:16,217 - Episode 200
+2018-05-01 18:35:32,772 - Episode reward mean: -1438.782
+2018-05-01 18:35:32,781 - Episode reward std: 126.131
+2018-05-01 19:03:08,442 - Episode 300
+2018-05-01 19:03:24,341 - Episode reward mean: -1217.676
+2018-05-01 19:03:24,348 - Episode reward std: 169.246
+2018-05-01 19:30:50,191 - Episode 400
+2018-05-01 19:31:06,980 - Episode reward mean: -1062.609
+2018-05-01 19:31:06,986 - Episode reward std: 240.652
+2018-05-01 19:58:36,092 - Episode 500
+2018-05-01 19:58:52,649 - Episode reward mean: -672.023
+2018-05-01 19:58:52,657 - Episode reward std: 375.541
+2018-05-01 19:58:52,658 - **Testing mode
+2018-05-01 20:00:35,203 - (test) Test reward mean: -549.199
+2018-05-01 20:00:35,203 - Test reward std: 374.589
+2018-05-01 20:00:35,203 - New best reward of -549.199224741043
+2018-05-01 20:00:35,203 - Beat old reward of None
+2018-05-01 20:28:03,841 - Episode 600
+2018-05-01 20:28:20,339 - Episode reward mean: -576.117
+2018-05-01 20:28:20,341 - Episode reward std: 297.558
+2018-05-01 20:55:48,931 - Episode 700
+2018-05-01 20:56:05,698 - Episode reward mean: -549.118
+2018-05-01 20:56:05,701 - Episode reward std: 308.890
+2018-05-01 21:23:25,658 - Episode 800
+2018-05-01 21:23:42,570 - Episode reward mean: -307.178
+2018-05-01 21:23:42,579 - Episode reward std: 191.724
+2018-05-01 21:51:08,215 - Episode 900
+2018-05-01 21:51:24,616 - Episode reward mean: -238.626
+2018-05-01 21:51:24,622 - Episode reward std: 197.058
+2018-05-01 22:15:00,200 - Episode 1000
+2018-05-01 22:15:15,873 - Episode reward mean: -351.111
+2018-05-01 22:15:15,874 - Episode reward std: 339.522
+2018-05-01 22:15:15,875 - **Testing mode
+2018-05-01 22:16:52,929 - (test) Test reward mean: -182.213
+2018-05-01 22:16:52,930 - Test reward std: 120.950
+2018-05-01 22:16:52,930 - New best reward of -182.21281807466625
+2018-05-01 22:16:52,930 - Beat old reward of -549.199224741043
+2018-05-01 22:42:12,715 - Episode 1100
+2018-05-01 22:42:27,925 - Episode reward mean: -196.994
+2018-05-01 22:42:27,931 - Episode reward std: 141.483
+2018-05-01 23:07:53,074 - Episode 1200
+2018-05-01 23:08:08,380 - Episode reward mean: -217.265
+2018-05-01 23:08:08,384 - Episode reward std: 205.619
+2018-05-01 23:33:32,512 - Episode 1300
+2018-05-01 23:33:48,215 - Episode reward mean: -186.809
+2018-05-01 23:33:48,217 - Episode reward std: 167.563
+2018-05-01 23:59:14,395 - Episode 1400
+2018-05-01 23:59:29,956 - Episode reward mean: -176.130
+2018-05-01 23:59:29,957 - Episode reward std: 111.707
+2018-05-02 00:24:59,620 - Episode 1500
+2018-05-02 00:25:15,210 - Episode reward mean: -202.653
+2018-05-02 00:25:15,218 - Episode reward std: 190.522
+2018-05-02 00:25:15,225 - **Testing mode
+2018-05-02 00:26:53,313 - (test) Test reward mean: -154.437
+2018-05-02 00:26:53,313 - Test reward std: 115.425
+2018-05-02 00:26:53,313 - New best reward of -154.4374712486596
+2018-05-02 00:26:53,313 - Beat old reward of -182.21281807466625
+2018-05-02 00:52:18,435 - Episode 1600
+2018-05-02 00:52:33,736 - Episode reward mean: -215.666
+2018-05-02 00:52:33,737 - Episode reward std: 174.791
