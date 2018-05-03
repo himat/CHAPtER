@@ -122,7 +122,7 @@ def main(args):
         elif args.env_name == "LunarLander-v2" or args.env_name == "LunarLanderContinuous-v2":
             default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
         elif args.env_name == "Pendulum-v0":
-            default_goal = np.array([1.0, 0.0, 0.0]) # cos(theta), sin(theta), theta dot 
+            default_goal = np.array([1.0, 0.0]) # cos(theta), sin(theta), theta dot 
                                                     # theta is normalized between pi and -pi
             logger.info(default_goal.shape)
         else:
