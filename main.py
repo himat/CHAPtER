@@ -60,7 +60,7 @@ def parse_arguments():
     
     # ER
     parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=32)
-    parser.add_argument('--hindsight', action="store_true")
+    parser.add_argument('--hindsight-replay', dest='hindsight_replay',action="store_true")
     parser.add_argument('--combined-replay', dest='combined_replay', action="store_true")
     parser.add_argument('--priority-replay', dest='priority_replay', action="store_true")
     # TODO: add diffeq ultimate replay evolution adaptation 
@@ -116,11 +116,14 @@ def main(args):
     logger.info(f"Alg: {args.alg}")
     
 
-    if args.hindsight:
+    if args.hindsight_replay:
         if args.env_name == "MountainCar-v0" or args.env_name == "MountainCarContinuous-v0":
             default_goal = np.array([[0.5]]) # flag at x = 0.5
         elif args.env_name == "LunarLander-v2" or args.env_name == "LunarLanderContinuous-v2":
             default_goal = np.array([[0.0, 0.0]]) # landing pad at x,y = (0,0)
+        elif args.env_name == "Pendulum-v0":
+            default_goal = np.array([[1.0, 0.0]]) # cos(theta), sin(theta), theta dot 
+                                                    # theta is normalized between pi and -pi
         else:
             raise ValueError("Hindsight not enabled for this env")
 
@@ -164,7 +167,7 @@ def main(args):
         if args.alg == "a2c":
             assert not args.priority_replay, "NYI"
             assert not args.combined_replay, "NYI"
-            assert not args.hindsight, "NYI"
+            assert not args.hindsight_replay, "NYI"
             agent.train(args.num_episodes, gamma=args.gamma, 
                 report_interval=args.train_mod, test_interval=args.test_mod, render=args.render)
         elif args.alg == "dqn":
@@ -173,7 +176,7 @@ def main(args):
             print_episode_mod=args.train_mod, test_episode_mod=args.test_mod,
             replay_mem_size=args.memory_size, default_goal=default_goal)
         elif args.alg == "ddpg":
-            agent.train(env, args.num_episodes, default_goal=default_goal, hindsight_replay=args.hindsight,
+            agent.train(env, args.num_episodes, default_goal=default_goal, hindsight_replay=args.hindsight_replay,
                 train_mod=args.train_mod, test_mod=args.test_mod)
         
 
