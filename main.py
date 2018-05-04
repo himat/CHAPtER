@@ -157,8 +157,7 @@ def main(args):
         agent = A2C(env, args.model_name, args.actor_model_path, args.actor_lr, 
             args.critic_model_path, args.critic_lr, N=args.N, logger=logger)
     elif args.alg == "dqn":
-        agent, use_episodes, num_train_episodes, num_train_steps = 
-            create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
+        agent, use_episodes, num_train_episodes, num_train_steps = create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
     elif args.alg == "ddpg":
         agent = DDPG(env, args.critic_lr, args.actor_lr, args.gamma, tau=args.tau, 
             batch_size=args.replay_batch, default_goal=default_goal)
