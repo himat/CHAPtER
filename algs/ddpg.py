@@ -210,7 +210,7 @@ class CriticNetwork(object):
 # Taken from https://github.com/openai/baselines/blob/master/baselines/ddpg/noise.py, which is
 # based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
 class OrnsteinUhlenbeckActionNoise:
-    def __init__(self, mu, sigma=0.3, theta=.15, dt=1e-2, x0=None):
+    def __init__(self, mu, sigma=0.01, theta=.15, dt=1e-2, x0=None):
         self.theta = theta
         self.mu = mu
         self.sigma = sigma
@@ -247,7 +247,7 @@ def build_summaries():
 
 
 class DDPG():
-    def __init__(self, env, critic_lr=0.0001, actor_lr=0.0001, gamma=0.99, tau=0.0001, batch_size=64, default_goal=None):
+    def __init__(self, env, critic_lr=0.0001, actor_lr=0.0001, gamma=0.99, tau=0.001, batch_size=64, default_goal=None):
         action_dim = env.action_space.shape[0]
 
         self.sess = tf.Session()
@@ -255,6 +255,7 @@ class DDPG():
 
         state_dim = env.observation_space.shape[0]
         action_bound = env.action_space.high
+        action_lower_bound = env.action_space.low
         # Ensure action bound is symmetric
         assert (env.action_space.high == -env.action_space.low).all()
         if default_goal is not None:

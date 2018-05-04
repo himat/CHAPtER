@@ -57,6 +57,9 @@ def parse_arguments():
     parser.add_argument('--deepness',dest='deepness',type=str,default=False)
     parser.add_argument('--lr',dest='lr',type=float,default=0.0001)
     parser.add_argument('--alt-learn', dest='alt_learn', action="store_true")
+
+    #DDPG
+    parser.add_argument('--tau', type=float, default=0.001)
     
     # ER
     parser.add_argument('--replay-batch',dest='replay_batch',type=int, default=32)
@@ -151,11 +154,15 @@ def main(args):
     print(f"Num env outputs (actions): {num_outputs}")
 
     if args.alg == "a2c":
-        agent = A2C(env, args.model_name, args.actor_model_path, args.actor_lr, args.critic_model_path, args.critic_lr, N=args.N, logger=logger)
+        agent = A2C(env, args.model_name, args.actor_model_path, args.actor_lr, 
+            args.critic_model_path, args.critic_lr, N=args.N, logger=logger)
     elif args.alg == "dqn":
-        agent, use_episodes, num_train_episodes, num_train_steps = create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
+        agent, use_episodes, num_train_episodes, num_train_steps = 
+            create_dqn(logger, args, env, default_goal, curr_model_dir, time_seed)
     elif args.alg == "ddpg":
-        agent = DDPG(env, args.critic_lr, args.actor_lr, args.gamma, batch_size=args.replay_batch, default_goal=default_goal)
+        agent = DDPG(env, args.critic_lr, args.actor_lr, args.gamma, tau=args.tau, 
+            batch_size=args.replay_batch, default_goal=default_goal)
+
 
     if args.record_video_only:
         agent.test(record_video=True)
