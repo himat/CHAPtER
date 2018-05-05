@@ -20,6 +20,8 @@ logger = logging.getLogger('10703')
 
 from replay.memory import Replay_Memory
 
+EPS = 1e-6
+
 # ===========================
 #   Actor and Critic DNNs
 # ===========================
@@ -210,7 +212,7 @@ class CriticNetwork(object):
 # Taken from https://github.com/openai/baselines/blob/master/baselines/ddpg/noise.py, which is
 # based on http://math.stackexchange.com/questions/1287634/implementing-ornstein-uhlenbeck-in-matlab
 class OrnsteinUhlenbeckActionNoise:
-    def __init__(self, mu, sigma=0.01, theta=.15, dt=1e-2, x0=None):
+    def __init__(self, mu, sigma=0.3, theta=.15, dt=1e-2, x0=None):
         self.theta = theta
         self.mu = mu
         self.sigma = sigma
@@ -306,9 +308,13 @@ class DDPG():
                 buf.append_HER_episode(current_episode) # Add exps with HER goals
 
     def train(self, env, num_eps=10000, combined_replay=False, hindsight_replay=False, 
-        priority_replay=False, render=False, default_goal=None, batch_size=64, train_mod=1,
+        priority_replay=False, priority_replay_alpha=0.6, render=False, default_goal=None, batch_size=64, train_mod=1,
         test_mod=1000):
 
+        priority_replay_alpha = 0.6
+        priority_replay_beta_init = 0.4
+        priority_replay_beta = priority_replay_beta_init # TODO: anneal
+        
         sess = self.sess
         # Set up summary Ops
         summary_ops, summary_vars = build_summaries()
@@ -322,7 +328,7 @@ class DDPG():
 
         # Initialize replay memory
         replay_buffer = Replay_Memory(combined=combined_replay, prioritized=priority_replay, 
-            hindsight=hindsight_replay, default_goal=default_goal)
+            hindsight=hindsight_replay, default_goal=default_goal, priority_alpha=priority_replay_alpha)
 
         self.burn_in(env, replay_buffer, default_goal=default_goal)
 
@@ -372,7 +378,7 @@ class DDPG():
                 current_episode.append(exp)
                 replay_buffer.append(exp)
                
-                samples, sample_weights, sample_indexes = replay_buffer.sample_batch(batch_size)
+                samples, sample_weights, sample_indexes = replay_buffer.sample_batch(batch_size, beta=priority_replay_beta)
 
                 s_batch, r_batch, a_batch, s2_batch, t_batch = \
                     tuple([np.concatenate(list(map(lambda x: x[i], samples))) if i == 0 or i == 3 or i == 2 else 
@@ -403,6 +409,12 @@ class DDPG():
                 self.critic.update_target_network()
 
                 s = s2
+
+
+                if priority_replay:
+                    
+                    td_errors = np.reshape(y_i, (-1, 1)) - predicted_q_value 
+                    replay_buffer.update_priorities(sample_indexes, np.abs(td_errors) + EPS)
 
             if replay_buffer.hindsight:
                 replay_buffer.append_HER_episode(current_episode, 
