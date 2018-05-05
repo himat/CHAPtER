@@ -183,6 +183,7 @@ def main(args):
             replay_mem_size=args.memory_size, default_goal=default_goal)
         elif args.alg == "ddpg":
             agent.train(env, args.num_episodes, default_goal=default_goal, hindsight_replay=args.hindsight_replay,
+                priority_replay=args.priority_replay, combined_replay=args.combined_replay,
                 train_mod=args.train_mod, test_mod=args.test_mod)
         
 
