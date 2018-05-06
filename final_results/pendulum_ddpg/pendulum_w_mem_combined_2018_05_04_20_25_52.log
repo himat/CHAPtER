@@ -1,0 +1,15 @@
+2018-05-04 20:25:52,283 - Command line args: Namespace(N=50, actor_lr=0.01, actor_model_path=None, alg='ddpg', alt_learn=False, combined_replay=True, critic_lr=0.01, critic_model_path=None, deepness=False, env_name='Pendulum-v0', epsilon=0.5, gamma=0.99, hindsight_replay=False, lr=0.0001, memory_size=50000, model_name='pendulum_w_mem_combined', num_episodes=50000, priority_replay=False, record_video_only=False, render=False, replay_batch=32, seed=None, tau=0.001, test_mod=500, test_only=False, train_mod=100)
+2018-05-04 20:25:52,283 - Log saving to logs/pendulum_w_mem_combined_2018_05_04_20_25_52.log
+2018-05-04 20:25:52,283 - Alg: ddpg
+2018-05-04 20:25:52,283 - Numpy random seed 2747845944
+2018-05-04 20:25:53,525 - Burning in 10000 experiences
+2018-05-04 20:26:21,339 - Episode 0
+2018-05-04 20:44:07,940 - Episode 100
+2018-05-04 20:44:20,993 - Episode reward mean: -708.457
+2018-05-04 20:44:20,999 - Episode reward std: 587.433
+2018-05-04 21:05:43,191 - Episode 200
+2018-05-04 21:05:56,163 - Episode reward mean: -196.811
+2018-05-04 21:05:56,166 - Episode reward std: 189.887
+2018-05-04 21:27:20,314 - Episode 300
+2018-05-04 21:27:30,027 - Episode reward mean: -182.607
+2018-05-04 21:27:30,028 - Episode reward std: 130.806

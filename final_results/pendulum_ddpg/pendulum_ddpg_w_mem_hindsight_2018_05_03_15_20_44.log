@@ -1,0 +1,70 @@
+2018-05-03 15:20:44,113 - Command line args: Namespace(N=50, actor_lr=0.0001, actor_model_path=None, alg='ddpg', alt_learn=False, combined_replay=False, critic_lr=0.0001, critic_model_path=None, deepness=False, env_name='Pendulum-v0', epsilon=0.5, gamma=0.99, hindsight_replay=True, lr=0.0001, memory_size=50000, model_name='pendulum_ddpg_w_mem_combined', num_episodes=50000, priority_replay=False, record_video_only=False, render=False, replay_batch=64, seed=None, test_mod=500, test_only=False, train_mod=100)
+2018-05-03 15:20:44,113 - Log saving to logs/pendulum_ddpg_w_mem_combined_2018_05_03_15_20_44.log
+2018-05-03 15:20:44,113 - Alg: ddpg
+2018-05-03 15:20:44,114 - Numpy random seed 2746795436
+2018-05-03 15:20:45,284 - Burning in 10000 experiences
+2018-05-03 15:21:02,658 - Episode 0
+2018-05-03 15:30:29,966 - Episode 100
+2018-05-03 15:30:37,347 - Episode reward mean: -1377.905
+2018-05-03 15:30:37,348 - Episode reward std: 227.878
+2018-05-03 15:39:46,924 - Episode 200
+2018-05-03 15:39:51,300 - Episode reward mean: -1454.786
+2018-05-03 15:39:51,301 - Episode reward std: 137.383
+2018-05-03 15:46:56,159 - Episode 300
+2018-05-03 15:47:00,539 - Episode reward mean: -1198.469
+2018-05-03 15:47:00,540 - Episode reward std: 294.117
+2018-05-03 15:54:05,053 - Episode 400
+2018-05-03 15:54:09,420 - Episode reward mean: -1107.032
+2018-05-03 15:54:09,422 - Episode reward std: 381.295
+2018-05-03 16:01:15,260 - Episode 500
+2018-05-03 16:01:19,610 - Episode reward mean: -914.791
+2018-05-03 16:01:19,611 - Episode reward std: 402.429
+2018-05-03 16:01:19,611 - **Testing mode
+2018-05-03 16:01:50,748 - (test) Test reward mean: -522.401
+2018-05-03 16:01:50,748 - Test reward std: 432.901
+2018-05-03 16:01:50,748 - New best reward of -522.4014502452534
+2018-05-03 16:01:50,748 - Beat old reward of None
+2018-05-03 16:08:48,343 - Episode 600
+2018-05-03 16:08:52,644 - Episode reward mean: -614.897
+2018-05-03 16:08:52,645 - Episode reward std: 455.472
+2018-05-03 16:15:58,914 - Episode 700
+2018-05-03 16:16:03,258 - Episode reward mean: -566.658
+2018-05-03 16:16:03,259 - Episode reward std: 505.825
+2018-05-03 16:23:09,628 - Episode 800
+2018-05-03 16:23:13,869 - Episode reward mean: -422.556
+2018-05-03 16:23:13,870 - Episode reward std: 423.008
+2018-05-03 16:30:18,946 - Episode 900
+2018-05-03 16:30:23,274 - Episode reward mean: -361.616
+2018-05-03 16:30:23,275 - Episode reward std: 357.464
+2018-05-03 16:37:26,314 - Episode 1000
+2018-05-03 16:37:30,551 - Episode reward mean: -191.311
+2018-05-03 16:37:30,552 - Episode reward std: 117.787
+2018-05-03 16:37:30,552 - **Testing mode
+2018-05-03 16:38:01,777 - (test) Test reward mean: -184.233
+2018-05-03 16:38:01,778 - Test reward std: 130.390
+2018-05-03 16:38:01,778 - New best reward of -184.23286276176148
+2018-05-03 16:38:01,778 - Beat old reward of -522.4014502452534
+2018-05-03 16:45:05,264 - Episode 1100
+2018-05-03 16:45:09,516 - Episode reward mean: -176.120
+2018-05-03 16:45:09,516 - Episode reward std: 98.533
+2018-05-03 16:52:39,981 - Episode 1200
+2018-05-03 16:52:45,293 - Episode reward mean: -169.561
+2018-05-03 16:52:45,294 - Episode reward std: 111.852
+2018-05-03 17:01:50,177 - Episode 1300
+2018-05-03 17:01:55,577 - Episode reward mean: -213.389
+2018-05-03 17:01:55,577 - Episode reward std: 204.246
+2018-05-03 17:10:58,213 - Episode 1400
+2018-05-03 17:11:03,836 - Episode reward mean: -166.904
+2018-05-03 17:11:03,837 - Episode reward std: 102.192
+2018-05-03 17:25:35,367 - Episode 1500
+2018-05-03 17:25:46,773 - Episode reward mean: -195.722
+2018-05-03 17:25:46,774 - Episode reward std: 169.830
+2018-05-03 17:25:46,774 - **Testing mode
+2018-05-03 17:26:57,627 - (test) Test reward mean: -194.460
+2018-05-03 17:26:57,630 - Test reward std: 175.929
+2018-05-03 17:44:04,326 - Episode 1600
+2018-05-03 17:44:12,461 - Episode reward mean: -160.438
+2018-05-03 17:44:12,468 - Episode reward std: 131.957
+2018-05-03 17:57:44,838 - Episode 1700
+2018-05-03 17:57:53,497 - Episode reward mean: -177.109
+2018-05-03 17:57:53,497 - Episode reward std: 120.881
