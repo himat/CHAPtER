@@ -95,6 +95,8 @@ if __name__ == '__main__':
   xmax = max(test_x + train_x)
   ymax = max(test_y + train_y)
 
+  print(test_x)
+  print(f"{list(filter(lambda x: x[1] >= 200, zip(test_x, test_y)))[0]} is first point of convergence")
   
   plt.figure(figsize=(16, 12), dpi=100)
 
